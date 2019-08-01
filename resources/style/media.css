@@ -1,0 +1,75 @@
+@media (max-width: 1060px) {
+	#index-sideMenu .navItem {
+		width: 70px;
+	}
+
+	.navItem .iconfont {
+		width: 40px;
+		height: 40px;
+		line-height: 40px;
+		margin-top: 12px;
+		font-size: 27px;
+	}
+}
+
+@media (min-width: 1060px) and (max-width: 1100px) {
+	#index-sideMenu .navItem {
+		width: 75px;
+	}
+
+	.navItem .iconfont {
+		width: 41px;
+		height: 41px;
+		line-height: 41px;
+		margin-top: 11px;
+		font-size: 28px;
+	}
+}
+
+@media (min-width: 1100px) and (max-width: 1150px) {
+	#index-sideMenu .navItem {
+		width: 80px;
+	}
+
+	.navItem .iconfont {
+		width: 42px;
+		height: 42px;
+		line-height: 42px;
+		margin-top: 10px;
+		font-size: 29px;
+	}
+}
+
+@media (min-width: 1150px) and (max-width: 1185px) {
+	#index-sideMenu .navItem {
+		width: 85px;
+	}
+
+	.navItem .iconfont {
+		width: 43px;
+		height: 43px;
+		line-height: 43px;
+		margin-top: 9px;
+		font-size: 30px;
+	}
+}
+
+@media (min-width: 1185px) and (max-width: 1200px) {
+	#index-sideMenu .navItem {
+		width: 90px;
+	}
+
+	.navItem .iconfont {
+		width: 44px;
+		height: 44px;
+		line-height: 44px;
+		margin-top: 8px;
+		font-size: 31px;
+	}
+}
+
+@media (min-width: 1260px) {
+	#index-sideMenu .navItem {
+		width: 100px;
+	}
+}

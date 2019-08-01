@@ -1,0 +1,1 @@
+var basePath = 'http://192.168.11.10:9080/wx/wx/';

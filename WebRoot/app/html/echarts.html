@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       	<meta charset="utf-8">
+       	<title>echarts</title>
+		<link rel="stylesheet" href="../../resources/style/reset.css">
+   </head>
+   <body>
+    <div class="">
+		<div>
+			<div class="">
+				<div class="">
+					<div>echarts1</div>
+<!-- 					<input type="text" class="input-sm" id="echarts1" onfocus="WdatePicker({dateFmt: 'yyyy-MM-dd',});"> -->
+					<select id="echarts1">
+						<option>2018-11-3</option>
+						<option>2018-11-4</option>
+					</select>
+					<div id="container1" style="width: 50%; height: 310px;"></div>
+				</div>
+				<div class="">
+					<div>echarts2</div>
+					<select id="echarts2">
+						<option>2018-11-3</option>
+						<option>2018-11-4</option>
+					</select>
+					<div id="container2" style="width: 50%; height: 310px;"></div>
+				</div>
+				<div class="">
+					<div>echarts3</div>
+					<select id="echarts3">
+						<option>2018-11-3</option>
+						<option>2018-11-4</option>
+					</select>
+					<div id="container3" style="width: 50%; height: 310px;"></div>
+				</div>
+				<div class="">
+					<div>echarts4</div>
+					<select id="echarts4">
+						<option>2018-11-3</option>
+						<option>2018-11-4</option>
+					</select>
+					<div id="container4" style="width: 50%; height: 310px;"></div>
+				</div>
+				<div class="">
+					<div>echarts5</div>
+					<select id="echarts5">
+						<option>2018-11-3</option>
+						<option>2018-11-4</option>
+					</select>
+					<div id="container5" style="width: 50%; height: 310px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+ <script src="../../resources/script/echarts/echarts-all.js"></script>
+ <script src="../../resources/script/jquery-1.12.1.min.js"></script>
+ <script src="../../resources/script/util.js"></script>
+ <script src="../../resources/script/My97DatePicker/WdatePicker.js"></script>
+ <script type="text/javascript">
+(function($) {
+	echarts1();
+	echarts2();
+	echarts3();
+	echarts4();
+	echarts5();
+	$("#echarts1").on('change',function(){
+		echarts1();
+	})
+	function echarts1(){
+		var dom = document.getElementById("container1");
+		var myChart = echarts.init(dom);
+		var app = {};
+		option = null;
+		option = {
+			    title : {
+			        text: 'echarts1',
+// 			        subtext: 'echarts1'
+			    },
+			    tooltip : {
+			        trigger: 'axis'
+			    },
+			    legend: {
+			        data:[
+			            '总数据',
+			            '当日数据'
+			        ]
+			    },
+			    toolbox: {
+			        show : true,
+			        feature : {
+			            mark : {show: true},
+			            dataView : {show: true, readOnly: false},
+			            magicType : {show: true, type: ['line', 'bar']},
+			            restore : {show: true},
+			            saveAsImage : {show: true}
+			        }
+			    },
+			    calculable : true,
+			    grid: {y: 70, y2:30, x2:20},
+			    xAxis : [
+			        {
+			            type : 'category',
+			            data : ['Line','Bar','Scatter','K','Map']
+			        },
+			        {
+			            type : 'category',
+			            axisLine: {show:false},
+			            axisTick: {show:false},
+			            axisLabel: {show:false},
+			            splitArea: {show:false},
+			            splitLine: {show:false},
+			            data : ['Line','Bar','Scatter','K','Map']
+			        }
+			    ],
+			    yAxis : [
+			        {
+			            type : 'value',
+			            name : '里程',
+			        }
+			    ],
+			    series : [
+			        {
+			            name:'当日数据',
+			            type:'bar',
+			            itemStyle: {normal: {color:'#006699', label:{show:true}}},
+			            data:[40,155,95,75, 0]
+			        },
+			        {
+			            name:'总数据',
+			            type:'bar',
+			            itemStyle: {normal: {color:'#4cabce', label:{show:true}}},
+			            xAxisIndex:1,
+			            data:[96,224,164,124,0]
+			        },
+			    ]
+			};
+		if (option && typeof option === "object") {
+		    myChart.setOption(option, true);
+		}
+	}
+	
+	$("#echarts2").on('change',function(){
+		echarts2();
+	})
+	function echarts2(){
+		var dom = document.getElementById("container2");
+		var myChart = echarts.init(dom);
+		var app = {};
+		option = null;
+		option = {
+			    title : {
+			        text: 'echarts2',
+// 			        subtext: 'echarts2'
+			    },
+			    tooltip : {
+			        trigger: 'axis'
+			    },
+			    legend: {
+			        data:[
+			            '总数据',
+			            '当日数据'
+			        ]
+			    },
+			    toolbox: {
+			        show : true,
+			        feature : {
+			            mark : {show: true},
+			            dataView : {show: true, readOnly: false},
+			            magicType : {show: true, type: ['line', 'bar']},
+			            restore : {show: true},
+			            saveAsImage : {show: true}
+			        }
+			    },
+			    calculable : true,
+			    grid: {y: 70, y2:30, x2:20},
+			    xAxis : [
+			        {
+			            type : 'category',
+			            data : ['Line','Bar','Scatter','K','Map']
+			        },
+			        {
+			            type : 'category',
+			            axisLine: {show:false},
+			            axisTick: {show:false},
+			            axisLabel: {show:false},
+			            splitArea: {show:false},
+			            splitLine: {show:false},
+			            data : ['Line','Bar','Scatter','K','Map']
+			        }
+			    ],
+			    yAxis : [
+			        {
+			            type : 'value',
+			            name : '时长',
+			        }
+			    ],
+			    series : [
+			        {
+			            name:'当日数据',
+			            type:'bar',
+			            itemStyle: {normal: {color:'#006699', label:{show:true}}},
+			            data:[10,10,10,10, 10]
+			        },
+			        {
+			            name:'总数据',
+			            type:'bar',
+			            xAxisIndex:1,
+			            itemStyle: {normal: {color:'#4cabce', label:{show:true}}},
+			            data:[90,90,90,90,90]
+			        },
+			    ]
+			};
+		if (option && typeof option === "object") {
+		    myChart.setOption(option, true);
+		}
+	}
+	
+	$("#echarts3").on('change',function(){
+		echarts3();
+	})
+	function echarts3(){
+		var dom = document.getElementById("container3");
+		var myChart = echarts.init(dom);
+		var app = {};
+		option = null;
+		option = {
+			    title : {
+			        text: 'echarts3',
+// 			        subtext: 'echarts3'
+			    },
+			    tooltip : {
+			        trigger: 'axis'
+			    },
+			    legend: {
+			        data:[
+			            '总数据',
+			            '当日数据'
+			        ]
+			    },
+			    toolbox: {
+			        show : true,
+			        feature : {
+			            mark : {show: true},
+			            dataView : {show: true, readOnly: false},
+			            magicType : {show: true, type: ['line', 'bar']},
+			            restore : {show: true},
+			            saveAsImage : {show: true}
+			        }
+			    },
+			    calculable : true,
+			    grid: {y: 70, y2:30, x2:20},
+			    xAxis : [
+			        {
+			            type : 'category',
+			            data : ['Line','Bar','Scatter','K','Map']
+			        },
+			        {
+			            type : 'category',
+			            axisLine: {show:false},
+			            axisTick: {show:false},
+			            axisLabel: {show:false},
+			            splitArea: {show:false},
+			            splitLine: {show:false},
+			            data : ['Line','Bar','Scatter','K','Map']
+			        }
+			    ],
+			    yAxis : [
+			        {
+			            type : 'value',
+			            name : '运输量',
+			        }
+			    ],
+			    series : [
+			        {
+			            name:'当日数据',
+			            type:'bar',
+			            itemStyle: {normal: {color:'#006699', label:{show:true}}},
+			            data:[20,20,20,20, 20]
+			        },
+			        {
+			            name:'总数据',
+			            type:'bar',
+			            xAxisIndex:1,
+			            itemStyle: {normal: {color:'#4cabce', label:{show:true}}},
+			            data:[90,90,80,80,80]
+			        },
+			    ]
+			};
+		if (option && typeof option === "object") {
+		    myChart.setOption(option, true);
+		}
+	}
+	
+	$("#echarts4").on('change',function(){
+		echarts4();
+	})
+	function echarts4(){
+		var dom = document.getElementById("container4");
+		var myChart = echarts.init(dom);
+		var app = {};
+		option = null;
+		option = {
+				title : {
+			        text: 'echarts4',
+			    },
+
+			    tooltip : {
+			        trigger: 'axis'
+			    },
+			    toolbox: {
+			        show : true,
+			        feature : {
+			            mark : {show: true},
+			            dataView : {show: true, readOnly: false},
+			            magicType: {show: true, type: ['line', 'bar']},
+			            restore : {show: true},
+			            saveAsImage : {show: true}
+			        }
+			    },
+			    calculable : true,
+			    legend: {
+			        data:['当日','累计']
+			    },
+			    xAxis : [
+			        {
+			            type : 'category',
+			            data : ['地铁','公交']
+			        }
+			    ],
+			    yAxis : [
+			        {
+			            type : 'value',
+			            name : '',
+			           
+			        },
+			    ],
+
+			    series: [
+		 			     {
+	 			            name:'当日',
+	 			            type:'bar',
+	 			           itemStyle: {normal: {color:'#006699', label:{show:true}}},
+	 			            data:[100,200]
+	 			         },
+			             {
+			                 name:'累计',
+			                 type:'line',
+			                 itemStyle: {normal: {color:'#4cabce', label:{show:true}}},
+			                 smooth: true,
+			                 data: [300, 280],
+			             },
+			         ]
+			};
+		if (option && typeof option === "object") {
+		    myChart.setOption(option, true);
+		}
+	}
+	$("#echarts5").on('change',function(){
+		echarts5();
+	})
+	function echarts5(){
+		var dom = document.getElementById("container5");
+		var myChart = echarts.init(dom);
+		var app = {};
+		option = null;
+		option = {
+			    title : {
+			        text: 'echarts5',
+			    },
+			    tooltip : {
+			        trigger: 'axis'
+			    },
+			    legend: {
+			        data:['运输量']
+			    },
+			    toolbox: {
+			        show : true,
+			        feature : {
+			            mark : {show: true},
+			            dataView : {show: true, readOnly: false},
+			            magicType: {show: true, type: ['line', 'bar']},
+			            restore : {show: true},
+			            saveAsImage : {show: true}
+			        }
+			    },
+			    calculable : true,
+			    xAxis : [
+			        {
+			        	name:'运输量',
+			            type : 'value',
+// 			            boundaryGap : [0, 0.01]
+			        }
+			    ],
+			    yAxis : [
+			        {
+			            type : 'category',
+			            data : ['国内贵宾','T3','T2','T1','TO']
+			        }
+			    ],
+			    series : [
+			        {
+			            name:'运输量',
+			            type:'bar',
+			            itemStyle: {normal: {color:'#4cabce', label:{show:true}}},
+			            data:[182, 234, 290, 104, 500]
+			        },
+			    ]
+			};
+		if (option && typeof option === "object") {
+		    myChart.setOption(option, true);
+		}
+	}
+})(jQuery);
+</script>
+</body>
+</html>

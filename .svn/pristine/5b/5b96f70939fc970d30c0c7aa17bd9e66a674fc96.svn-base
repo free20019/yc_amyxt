@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>异常订单管理</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<style>
+	 .w50 {
+			float: left;
+			width: 50%;
+			margin-left: 0;
+			margin-right: 0;
+		}
+	</style>
+</head>
+<body>
+<div class="container-fluid">
+	<div class="form-inline query-box">
+		<div class="form-group">
+			<label for="ycdd_vehicle" class="control-label">车牌号码</label>
+			<select class="form-control select2" id="ycdd_vehicle" data-placeholder="车牌号码" style="width: 160px;" >
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="ycdd_status" class="control-label">订单状态</label>
+				<select class="form-control" id="ycdd_status" placeholder="订单状态" style="width: 160px;">
+					<option value="">全部</option>
+					<option value="2">订单正常</option>
+					<option value="0">订单异常</option>
+				</select>
+		</div>
+		<div class="form-group">
+			<label for="ycdd_handle" class="control-label">订单处理</label>
+				<select class="form-control" id="ycdd_handle" placeholder="订单处理" style="width: 160px;">
+					<option value="">全部</option>
+					<option value="1">已处理</option>
+					<option value="0">未处理</option>
+				</select>
+		</div>
+		<div class="form-group">
+			<label for="ycdd-startTime" class=" control-label">时间起</label>
+				<input type="text" class="form-control" onfocus="WdatePicker({dateFmt: 'yyyy-MM-dd HH:mm:ss',});" id="ycdd-startTime">
+		</div>
+		<div class="form-group">
+			<label for="ycdd-endTime" class=" control-label">时间止</label>
+				<input type="text" class="form-control" onfocus="WdatePicker({dateFmt: 'yyyy-MM-dd HH:mm:ss',});" id="ycdd-endTime" >
+		</div>
+		<button class="btn btn-primary btn-sm" onclick="findycdd();">查询</button>
+		<button class="btn btn-primary btn-sm" id="ycddDc">导出</button>
+	</div>
+</div>
+<div class="container-fluid tableDiv" style="overflow-x: auto;">
+	<table class="table table-striped table-hover table-condensed" id="ycdd-tabel">
+		<thead>
+		<tr>
+			<th width="40"><input type="checkbox" class="checkboxAll"></th>
+			<th width="90">序号</th>
+			<th width="130">商品编号</th>
+			<th width="130">车牌号码</th>
+			<th width="130">入库时间</th>
+			<th width="130">订单金额</th>
+			<th width="130">订单状态</th>
+			<th width="130">用户昵称</th>
+			<th width="130">联系方式</th>
+			<th width="130">异常说明</th>
+			<th width="130">订单处理</th>
+			<th width="130">操作</th>
+		</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+<div style="text-align: center">
+	<ul id="pageLimit"></ul> 
+</div>
+<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script src="../../resources/script/layer/layer.js"></script>
+<script src="../../resources/script/util.js"></script>
+<script src="../../resources/checkbox.js"></script>
+<script src="../../resources/bootstrap-paginator.js"></script>
+<script src="../../resources/script/My97DatePicker/WdatePicker.js"></script>
+<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+<script src="common.js"></script>
+<script>
+$(document).ready(function() {
+	  $(".select2").select2({  
+			language: "zh-CN",  //设置 提示语言
+	        tags:true,  
+	        createTag:function (decorated, params) {  
+	            return null;  
+	        },  
+	    });
+	});
+$.ajax({
+	type: "POST",
+	url: basePath + "common/findcl",
+	data:{},
+	timeout : 180000,
+	dataType: 'json',
+	success:function(json){
+		var data= json.datas;
+		for (var i = 0; i < data.length; i++) {
+			data[i].id=data[i].name;
+			data[i].text=data[i].name;
+		}
+		var qb={};
+		qb.id='null';
+		qb.text='默认(为空)';
+		data.unshift(qb);
+		$('#ycdd_vehicle').select2({
+			data: data,
+			language:'zh-CN',
+		});
+	},
+	error: function(){
+	}         
+});
+function handle(str){
+	layer.confirm('你确定要将选中的数据设置为"已处理"吗？', {
+		btn: ['确定', '取消'],
+		offset: '100px'
+	}, function (layerIndex) {
+		$.ajax({
+			type: "POST",
+			url: basePath + "ycdd/handle",
+			data:{
+				"id":str
+			},
+			timeout : 180000,
+			dataType: 'json',
+			success:function(data){
+				if(data.info=='操作成功'){
+					layer.msg('操作成功');
+					findycdd();
+				}else{
+					layer.msg('操作失败');
+				}
+			},
+			error: function(){
+			}         
+		});	
+	}, function (layerIndex) {
+		layer.close(layerIndex);
+	});
+}
+findycdd();
+function findycdd(){
+	$.ajax({
+		type: "POST",
+		url: basePath + "ycdd/findycdd",
+		data:'postData={"page":"'+1+
+		 	'","pageSize":"'+10+
+			'","vehicle":"'+$('#ycdd_vehicle').val()+
+			'","status":"'+$('#ycdd_status').val()+
+			'","handle":"'+$('#ycdd_handle').val()+
+			'","startTime":"'+$('#ycdd-startTime').val()+
+			'","endTime":"'+$('#ycdd-endTime').val()+
+			'"}',
+		timeout : 180000,
+		dataType: 'json',
+		success:function(data){
+			$('#ycdd-tabel tbody').html("");
+			for (var i = 0; i < data.list.length; i++) {
+				var item = data.list[i];
+				$('<tr><td><input type="checkbox" class="checkbox"/></td><td>' + (i + 1) + '</td>' +
+						'<td>' + item.COMMODITY_ID + '</td>' +
+						'<td>' + item.VEHICLE + '</td>' +
+						'<td>' + (item.UPTIME==""?"":setformat1(new Date(item.UPTIME))) + '</td>' +
+						'<td>' + (item.TOTAL_FEE)/100 + '</td>' +
+						'<td>' + (item.COMMODITYSTATUS=="2"?"订单正常":"订单异常") + '</td>' +
+						'<td>' + item.NICKNAME + '</td>' +
+						'<td>' + item.LXFS + '</td>' +
+						'<td>' + item.MEMO + '</td>' +
+						'<td>' + (item.HANDLESTATUS=="1"?"已处理":"未处理 ") + '</td>' +
+						'<td>' + (item.COMMODITYSTATUS=="2"?'无需处理':'<a class="btn btn-primary btn-xs" style="margin-right: 4px;" onclick="handle(\''+item.COMMODITY_ID+'\');">处理</a>') + '</td>' +
+						'</tr>')
+						.data('database', item)
+						.appendTo('#ycdd-tabel tbody');
+			}
+			 var currentPage = data.CurrentPage; //当前页数
+	            var pageCount = data.pageCount; //总页数
+	            var options = {
+	           bootstrapMajorVersion: 3, //版本
+	           currentPage: currentPage, //当前页数
+	           totalPages: pageCount, //总页数
+	           numberOfPages: 5,
+	           shouldShowPage:true,//是否显示该按钮
+	           itemTexts: function (type, page, current) {
+	               switch (type) {
+	                   case "first":
+	                       return "首页";
+	                   case "prev":
+	                       return "上一页";
+	                   case "next":
+	                       return "下一页";
+	                   case "last":
+	                       return "末页";
+	                   case "page":
+	                       return page;
+	               }
+	           },//点击事件，用于通过Ajax来刷新整个list列表
+	           onPageClicked: function (event, originalEvent, type, page) {
+	        	   $.ajax({
+	        		   	type: "POST",
+	        			url: basePath + "ycdd/findycdd",
+	        			data:'postData={"page":"'+page+
+	        			 	'","pageSize":"'+10+
+	        				'","vehicle":"'+$('#ycdd_vehicle').val()+
+	        				'","status":"'+$('#ycdd_status').val()+
+	        				'","handle":"'+$('#ycdd_handle').val()+
+	        				'","startTime":"'+$('#ycdd-startTime').val()+
+	        				'","endTime":"'+$('#ycdd-endTime').val()+
+	        				'"}',
+	        			timeout : 180000,
+	        			dataType: 'json',
+	                   	success: function (data) {
+	                   		$('#ycdd-tabel tbody').html("");
+	                   		for (var i = 0; i < data.list.length; i++) {
+	            				var item = data.list[i];
+	            				$('<tr><td><input type="checkbox" class="checkbox"/></td><td>' + (i + 1) + '</td>' +
+	            						'<td>' + item.COMMODITY_ID + '</td>' +
+	            						'<td>' + item.VEHICLE + '</td>' +
+	            						'<td>' + (item.UPTIME==""?"":setformat1(new Date(item.UPTIME))) + '</td>' +
+	            						'<td>' + (item.TOTAL_FEE)/100 + '</td>' +
+	            						'<td>' + (item.COMMODITYSTATUS=="2"?"订单正常":"订单异常") + '</td>' +
+	            						'<td>' + item.NICKNAME + '</td>' +
+	            						'<td>' + item.LXFS + '</td>' +
+	            						'<td>' + item.MEMO + '</td>' +
+	            						'<td>' + (item.HANDLESTATUS=="1"?"已处理":"未处理 ") + '</td>' +
+	            						'<td>' + (item.COMMODITYSTATUS=="2"?'无需处理':'<a class="btn btn-primary btn-xs" style="margin-right: 4px;" onclick="handle(\''+item.COMMODITY_ID+'\');">处理</a>') + '</td>' +
+	            						'</tr>')
+	            						.data('database', item)
+	            						.appendTo('#ycdd-tabel tbody');
+	            			}
+
+	                   }/*success*/
+	               });
+
+
+	           }
+
+	       };
+	            if(data.list.length==0){
+	            	layer.msg('查询不到该信息！');
+	            	$('#pageLimit').html('');
+	            }else{
+			       $('#pageLimit').bootstrapPaginator(options);  
+	            }
+		},
+		error: function(){
+		}         
+	});
+}
+	$('#ycddDc').on('click', function() {
+		var postData={"vehicle":$('#ycdd_vehicle').val()
+			       	,"status":$('#ycdd_status').val()
+			       	,"handle":$('#ycdd_handle').val()
+			       	,"startTime":$('#ycdd-startTime').val()
+			       	,"endTime":$('#ycdd-endTime').val()
+						};
+		url = basePath + "ycdd/ycdddc?postData="+encodeURI(JSON.stringify(postData)), window.open(url)
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>在线管理</title>
+	<link rel="stylesheet" href="../../resources/style/reset.css">
+	<link rel="stylesheet" href="../../resources/style/iconfont.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="../../resources/script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.min.css">
+	<link rel="stylesheet" href="../../resources/script/select2/dist/css/select2.css">
+	<link rel="stylesheet" href="../../resources/style/main.css">
+	<style></style>
+</head>
+<body>
+<div class="container-fluid">
+	<div class="form-inline query-box">
+		<div class="form-group" style="padding-top: 4px; padding-bottom: 4px; margin-left: 20px;">
+			<label for="zx_terminal">终端编号</label>
+			<select class="form-control select2" id="zx_terminal" style="width: 160px;">
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="dd_company" class="control-label">车辆</label>
+				<select class="form-control select2" id="zx_vehicle" style="width: 160px;">
+				</select>
+		</div>
+		<button class="btn btn-primary btn-sm" onclick="findzx();">查询</button>
+<!-- 		<button class="btn btn-primary btn-sm" id="clDc">导出</button> -->
+		<a class="iconfont icon-shuaxin" style="font-size:25px;padding-left: 150px;" href="javascript:void(0);" onclick="findzx();" title="查询"></a>
+	</div>
+		<div>
+			&nbsp;&nbsp;总车辆:<span id="allvehicle">	</span>	
+			&nbsp;&nbsp;&nbsp;在线车辆:<span id="onlinevehicle"></span>	
+			&nbsp;&nbsp;&nbsp;在线率:<span id="rate"></span>	
+		</div>
+</div>
+<div class="container-fluid tableDiv" style="overflow-x: auto;">
+	<table class="table table-striped table-hover table-condensed" id="zx-tabel">
+		<thead>
+		<tr>
+			<th width="40"><input type="checkbox" class="checkboxAll"></th>
+			<th width="90">序号</th>
+			<th width="130">是否在线</th>
+			<th width="130">车牌号码</th>
+			<th width="130">终端编号</th>
+			<th width="130">座位在线状态</th>
+			<th width="130">最新上报时间</th>
+		</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+<div style="text-align: center">
+	<ul id="pageLimit"></ul> 
+</div>
+<script src="../../resources/script/jquery-1.12.1.min.js"></script>
+<script src="../../resources/script/bootstrap/js/bootstrap.js"></script>
+<script src="../../resources/script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="../../resources/script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+<script src="../../resources/script/layer/layer.js"></script>
+<script src="../../resources/script/util.js"></script>
+<script src="../../resources/checkbox.js"></script>
+<script src="../../resources/bootstrap-paginator.js"></script>
+<script src="../../resources/script/My97DatePicker/WdatePicker.js"></script>
+<script src="../../resources/script/select2/dist/js/i18n/zh-CN.js"></script>
+<script src="../../resources/script/select2/dist/js/select2.min.js"></script>
+<script>
+findzdbh();
+findcl();
+$.fn.modal.Constructor.prototype.enforceFocus = function () {}
+$(document).ready(function() {
+	  $(".select2").select2({  
+			language: "zh-CN",  //设置 提示语言
+	        tags:true,  
+	        createTag:function (decorated, params) {  
+	            return null;  
+	        },  
+	    });
+	});
+findzx();
+// function findzx(){
+// 	$.ajax({
+// 		 type: "POST",
+// 		url: basePath + "vehiclezx/findzx",
+// 		data:'postData={"page":"'+1+
+// 		'","terminal":"'+$('#zx_terminal').val()+
+// 		'","vehicle":"'+$('#zx_vehicle').val()+
+// 		'"}',
+// 		timeout : 180000,
+// 		dataType: 'json',
+// 		success:function(data){
+// 			$('#zx-tabel tbody').html("");
+// 			var date=new Date();
+// 			for (var i = 0; i < data.list.length; i++) {
+// 				var item = data.list[i];
+// 				var date2=date.getTime()-item.MDTUPDATETIME;
+// 				var status='<p><i class="iconfont icon-duankailianjiex"></i> 不在线</p>';
+// 				if(date2<60000){
+// 					status='<p><i class="iconfont icon-lianjie"></i> 在线</p>';
+// 				}
+// 				if(item.TIME!=''){
+// 					var seat="";
+// 					var arr=item.TIME.split(",");
+// 					for(var z = 0; z < arr.length; z++){
+// 						var date3=date.getTime()-arr[z];
+// 						if(date3<60000){
+// 							seat +='<i style="color: #00FF00;font-size: 25px;"  class="iconfont icon-zuoweishu"></i>';
+// 						}else{
+// 							seat +='<i style="color: #606060;font-size: 25px;" class="iconfont icon-zuoweishu"></i>';
+// 						}
+// 					}
+// 				}
+// 				$('<tr><td><input type="checkbox" class="checkbox"/></td><td>' + (i + 1) + '</td>' +
+// 						'<td>' + status + '</td>' +
+// 						'<td>' + item.VEHICLE_NO + '</td>' +
+// 						'<td>' + item.MDT_NO + '</td>' +
+// 						'<td>' + seat + '</td>' +
+// 						'<td>' + (item.MDTUPDATETIME==""?"":setformat1(new Date(item.MDTUPDATETIME))) + '</td>' +
+// 						'</tr>')
+// 						.data('database', item)
+// 						.appendTo('#zx-tabel tbody');
+// 			}
+// 			 var currentPage = data.CurrentPage; //当前页数
+// 	            var pageCount = data.pageCount; //总页数
+// 	            var options = {
+// 	           bootstrapMajorVersion: 3, //版本
+// 	           currentPage: currentPage, //当前页数
+// 	           totalPages: pageCount, //总页数
+// 	           numberOfPages: 5,
+// 	           shouldShowPage:true,//是否显示该按钮
+	          
+// 	           itemTexts: function (type, page, current) {
+// 	               switch (type) {
+// 	                   case "first":
+// 	                       return "首页";
+// 	                   case "prev":
+// 	                       return "上一页";
+// 	                   case "next":
+// 	                       return "下一页";
+// 	                   case "last":
+// 	                       return "末页";
+// 	                   case "page":
+// 	                       return page;
+// 	               }
+// 	           },//点击事件，用于通过Ajax来刷新整个list列表
+// 	           onPageClicked: function (event, originalEvent, type, page) {
+// 	               $.ajax({
+// 	            	   type: "POST",
+// 	           			url: basePath + "vehiclezx/findzx",
+// 	                   dataType : "json",
+// 	                   data:'postData={"page":"'+page+
+// 			           		'","terminal":"'+$('#zx_terminal').val()+
+// 			        		'","vehicle":"'+$('#zx_vehicle').val()+
+// 						'"}',
+// 						timeout : 180000,
+// 						dataType: 'json',
+// 	                   	success: function (data) {
+// 	                   		$('#zx-tabel tbody').html("");
+// 	                   		for (var i = 0; i < data.list.length; i++) {
+// 	            				var item = data.list[i];
+// 	            				var date2=date.getTime()-item.MDTUPDATETIME;
+// 	            				var status='<p><i class="iconfont icon-duankailianjiex"></i> 不在线</p>';
+// 	            				if(date2<60000){
+// 	            					status='<p><i class="iconfont icon-lianjie"></i> 在线</p>';
+// 	            				}
+// 	            				if(item.TIME!=''){
+// 	            					var seat="";
+// 	            					var arr=item.TIME.split(",");
+// 	            					for(var z = 0; z < arr.length; z++){
+// 	            						var date3=date.getTime()-arr[z];
+// 	            						if(date3<60000){
+// 	            							seat +='<i style="color: #00FF00;font-size: 25px;"  class="iconfont icon-zuoweishu"></i>';
+// 	            						}else{
+// 	            							seat +='<i style="color: #606060;font-size: 25px;" class="iconfont icon-zuoweishu"></i>';
+// 	            						}
+// 	            					}
+// 	            				}
+// 	            				$('<tr><td><input type="checkbox" class="checkbox"/></td><td>' + (i + 1) + '</td>' +
+// 	            						'<td>' + status + '</td>' +
+// 	            						'<td>' + item.VEHICLE_NO + '</td>' +
+// 	            						'<td>' + item.MDT_NO + '</td>' +
+// 	            						'<td>' + seat + '</td>' +
+// 	            						'<td>' + (item.MDTUPDATETIME==""?"":setformat1(new Date(item.MDTUPDATETIME))) + '</td>' +
+// 	            						'</tr>')
+// 	            						.data('database', item)
+// 	            						.appendTo('#zx-tabel tbody');
+// 	            			} 
+
+// 	                   }/*success*/
+// 	               });
+
+// 	           }
+
+// 	       };
+// 	            if(data.list.length==0){
+// 	            	layer.msg('查询不到该信息！');
+// 	            }else{
+// 			       $('#pageLimit').bootstrapPaginator(options);  
+// 	            }
+// 		},
+// 		error: function(){
+// 		}         
+// 	});
+// }
+
+function findzx(){
+	$.ajax({
+		 type: "POST",
+		url: basePath + "vehiclezx/findzx",
+		data:'postData={"page":"'+1+
+		'","terminal":"'+$('#zx_terminal').val()+
+		'","vehicle":"'+$('#zx_vehicle').val()+
+		'"}',
+		timeout : 180000,
+		dataType: 'json',
+		success:function(data){
+			$('#zx-tabel tbody').html("");
+			var date=new Date();
+			var count=0;
+			for (var ii = 0; ii < data.list2.length; ii++) {
+				var item2 = data.list2[ii];
+				var date3=date.getTime()-item2.UPTIME;
+				if(date3<60000){
+					count +=1;
+				}
+			}
+			$("#allvehicle").html(data.list2.length);
+			$("#onlinevehicle").html(count);
+			if(data.list2.length>0){
+				var num=count/data.list2.length*100
+				num = num.toFixed(2)
+				$("#rate").html(num+"%");
+			}else{
+				$("#rate").html("");
+			}
+			for (var i = 0; i < data.list.length; i++) {
+				var item = data.list[i];
+				var date2=date.getTime()-item.UPTIME;
+				var status='<p><i class="iconfont icon-duankailianjiex"></i> 不在线</p>';
+				if(date2<60000){
+					status='<p><i class="iconfont icon-lianjie"></i> 在线</p>';
+				}
+				if(item.SEATSTATUS!=''){
+					var seat="";
+					var arr=item.SEATSTATUS.split(",");
+						for(var z = 0; z < arr.length; z++){
+							if(arr[z]==1&&date2<60000){
+								seat +='<i style="color: #00FF00;font-size: 25px;"  class="iconfont icon-zuoweishu"></i>';
+							}else{
+								seat +='<i style="color: #606060;font-size: 25px;" class="iconfont icon-zuoweishu"></i>';
+							}
+						}
+				}
+				$('<tr><td><input type="checkbox" class="checkbox"/></td><td>' + (i + 1) + '</td>' +
+						'<td>' + status + '</td>' +
+						'<td>' + item.VEHICLE_NO + '</td>' +
+						'<td>' + item.MDT_NO + '</td>' +
+						'<td>' + seat + '</td>' +
+						'<td>' + (item.UPTIME==""?"":setformat1(new Date(item.UPTIME))) + '</td>' +
+						'</tr>')
+						.data('database', item)
+						.appendTo('#zx-tabel tbody');
+			}
+			 var currentPage = data.CurrentPage; //当前页数
+	            var pageCount = data.pageCount; //总页数
+	            var options = {
+	           bootstrapMajorVersion: 3, //版本
+	           currentPage: currentPage, //当前页数
+	           totalPages: pageCount, //总页数
+	           numberOfPages: 5,
+	           shouldShowPage:true,//是否显示该按钮
+	          
+	           itemTexts: function (type, page, current) {
+	               switch (type) {
+	                   case "first":
+	                       return "首页";
+	                   case "prev":
+	                       return "上一页";
+	                   case "next":
+	                       return "下一页";
+	                   case "last":
+	                       return "末页";
+	                   case "page":
+	                       return page;
+	               }
+	           },//点击事件，用于通过Ajax来刷新整个list列表
+	           onPageClicked: function (event, originalEvent, type, page) {
+	               $.ajax({
+	            	   type: "POST",
+	           			url: basePath + "vehiclezx/findzx",
+	                   dataType : "json",
+	                   data:'postData={"page":"'+page+
+			           		'","terminal":"'+$('#zx_terminal').val()+
+			        		'","vehicle":"'+$('#zx_vehicle').val()+
+						'"}',
+						timeout : 180000,
+						dataType: 'json',
+	                   	success: function (data) {
+	                   		$('#zx-tabel tbody').html("");
+	                   		for (var i = 0; i < data.list.length; i++) {
+	                   			var item = data.list[i];
+	                   			var count=0;
+	                			for (var ii = 0; ii < data.list2.length; ii++) {
+	                				var item2 = data.list2[ii];
+	                				var date3=date.getTime()-item2.UPTIME;
+	                				if(date3<60000){
+	                					count +=1;
+	                				}
+	                			}
+	                			$("#allvehicle").html(data.list2.length);
+	                			$("#onlinevehicle").html(count);
+	                			if(data.list2.length>0){				
+	                				var num=count/data.list2.length*100
+	                				num = num.toFixed(2)
+	                				$("#rate").html(num+"%");
+	                			}else{
+	                				$("#rate").html("");
+	                			}
+	            				var date2=date.getTime()-item.UPTIME;
+	            				var status='<p><i class="iconfont icon-duankailianjiex"></i> 不在线</p>';
+	            				if(date2<60000){
+	            					status='<p><i class="iconfont icon-lianjie"></i> 在线</p>';
+	            				}
+	            				if(item.SEATSTATUS!=''){
+	            					var seat="";
+	            					var arr=item.SEATSTATUS.split(",");
+	            					for(var z = 0; z < arr.length; z++){
+	        							if(arr[z]==1&&date2<60000){
+	        								seat +='<i style="color: #00FF00;font-size: 25px;"  class="iconfont icon-zuoweishu"></i>';
+	        							}else{
+	        								seat +='<i style="color: #606060;font-size: 25px;" class="iconfont icon-zuoweishu"></i>';
+	        							}
+	        						}
+	            				}
+	            				$('<tr><td><input type="checkbox" class="checkbox"/></td><td>' + (i + 1) + '</td>' +
+	            						'<td>' + status + '</td>' +
+	            						'<td>' + item.VEHICLE_NO + '</td>' +
+	            						'<td>' + item.MDT_NO + '</td>' +
+	            						'<td>' + seat + '</td>' +
+	            						'<td>' + (item.UPTIME==""?"":setformat1(new Date(item.UPTIME))) + '</td>' +
+	            						'</tr>')
+	            						.data('database', item)
+	            						.appendTo('#zx-tabel tbody');
+	            			} 
+
+	                   }/*success*/
+	               });
+
+	           }
+
+	       };
+	            if(data.list.length==0){
+	            	layer.msg('查询不到该信息！');
+	            }else{
+			       $('#pageLimit').bootstrapPaginator(options);  
+	            }
+		},
+		error: function(){
+		}         
+	});
+}
+
+function findzdbh(){
+	$.ajax({
+		type: "POST",
+		url: basePath + "common/findzd",
+		data:{},
+		timeout : 180000,
+		dataType: 'json',
+		success:function(data){
+			$("#zx_terminal").empty();
+			$("#zx_terminal").append('<option value="" >默认(为空)</option>');
+			for(var i=0; i<data.datas.length;i++){
+				if(obj.length>0){
+					if(obj == data.datas[i].name){
+						$("#zx_terminal").append('<option value="'+data.datas[i].name+'" selected>'+data.datas[i].name+'</option>');
+					}else{
+						$("#zx_terminal").append('<option value="'+data.datas[i].name+'">'+data.datas[i].name+'</option>');
+					}
+				}else{
+					$("#zx_terminal").append('<option value="'+data.datas[i].name+'">'+data.datas[i].name+'</option>');
+				}
+			}
+		},
+		error: function(){
+		}         
+	});
+}
+function findcl(){
+	$.ajax({
+		type: "POST",
+		async:false,
+		url: basePath + "common/findcl",
+		data:{},
+		timeout : 180000,
+		dataType: 'json',
+		success:function(data){
+			$("#zx_vehicle").empty();
+			$("#zx_vehicle").append('<option value="" >默认(为空)</option>');
+			for(var i=0; i<data.datas.length;i++){
+				if(obj.length>0){
+					if(obj == data.datas[i].name){
+						$("#zx_vehicle").append('<option value="'+data.datas[i].name+'" selected>'+data.datas[i].name+'</option>');
+					}else{
+						$("#zx_vehicle").append('<option value="'+data.datas[i].name+'">'+data.datas[i].name+'</option>');
+					}
+				}else{
+					$("#zx_vehicle").append('<option value="'+data.datas[i].name+'">'+data.datas[i].name+'</option>');
+				}
+			}
+		},
+		error: function(){
+		}         
+	});
+}
+	$('#clDc').on('click', function() {
+		url = basePath + "user/findclexcle?info="+$("#cl-query").val(), window.open(url)
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+package mvc.service;
+
+
+import java.util.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+
+
+
+
+
+
+
+import helper.JacksonUtil;
+
+import org.codehaus.jackson.type.TypeReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+
+
+@Service
+public class qyServer {
+	protected JdbcTemplate jdbcTemplate = null;
+
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+	@Autowired
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	private JacksonUtil jacksonUtil = JacksonUtil.buildNormalBinder();
+	public List<Map<String, Object>> findqy(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String province = String.valueOf(paramMap.get("province"));
+		String city = String.valueOf(paramMap.get("city"));
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String sql = "select com.*,cha.channel_name,cha.province,cha.city from tb_channel cha,tb_company com "
+				+ "where com.channel_id=cha.id" ;
+		if(province!=null&&province.length()>0&&!province.equals("null")&&!province.equals("省份")){
+			sql += " and cha.province= '"+province+"'";
+		}
+		if(city!=null&&city.length()>0&&!city.equals("null")&&!city.equals("地级市")){
+			sql += " and cha.city= '"+city+"'";
+		}
+		if(channel!=null&&channel.length()>0&&!channel.equals("null")){
+			sql += " and cha.id= '"+channel+"'";
+		}
+		if(company!=null&&company.length()>0&&!company.equals("null")){
+			sql += " and com.id= '"+company+"'";
+		}
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		return list;
+	}
+	public String findqyb(int pageIndex,int pageSize,String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String province = String.valueOf(paramMap.get("province"));
+		String city = String.valueOf(paramMap.get("city"));
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String sql = "select a.* from (select rownum rn ,com.*,cha.channel_name,cha.province,cha.city"
+				+ " from tb_channel cha,(select * from tb_company order by add_time desc) com"
+				+ " where com.channel_id=cha.id and rownum <= "+(pageIndex*pageSize);
+		if(province!=null&&province.length()>0&&!province.equals("null")&&!province.equals("省份")){
+			sql += " and cha.province= '"+province+"'";
+		}
+		if(city!=null&&city.length()>0&&!city.equals("null")&&!city.equals("地级市")){
+			sql += " and cha.city= '"+city+"'";
+		}
+		if(channel!=null&&channel.length()>0&&!channel.equals("null")){
+			sql += " and cha.id= '"+channel+"'";
+		}
+		if(company!=null&&company.length()>0&&!company.equals("null")){
+			sql += " and com.id= '"+company+"'";
+		}
+		sql +=") a where a.rn >"+((pageIndex-1)*pageSize);
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);	
+		return jacksonUtil.toJson(list);
+	}
+	public String addqy(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String contacts = String.valueOf(paramMap.get("contacts"));
+		String telNumber = String.valueOf(paramMap.get("telNumber"));
+		String phoneNumber = String.valueOf(paramMap.get("phoneNumber"));
+		String revenue = String.valueOf(paramMap.get("revenue"));
+		Map<String, Object> map = new HashMap<String, Object>();
+		int user_id = findMaxId("tb_company","ID");
+		int count = 0;
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		String date = df.format(new Date());// new Date()为获取当前系统时间，也可使用当前时间戳
+		String sql = "insert into tb_company (channel_id,company_name,USER_NAME,TELPHONE_NUM,PHONE_NUM,ADD_TIME,COMPANY_REVENUE,id) values "
+			+ " ('"+channel+"','"+company+"','"+contacts+"','"+telNumber+"','"+phoneNumber+"',to_date('"+date+"','yyyy-mm-dd hh24:mi:ss'),'"+revenue+"','"+user_id+"')";
+		try {
+			count = jdbcTemplate.update(sql);
+		} catch(RuntimeException e) {
+			if(e.getMessage().contains("ORA-02291")){
+				map.put("info", "不存在");
+				return jacksonUtil.toJson(map);
+			}
+			if(e.getMessage().contains("ORA-00001")){
+				map.put("info", "重复添加");
+				return jacksonUtil.toJson(map);
+			}
+		}
+
+		System.out.println(sql);
+		
+		if(count>0){
+			map.put("info", "添加成功");
+		}else{
+			map.put("info", "添加失败");
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public String editqy(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String contacts = String.valueOf(paramMap.get("contacts"));
+		String telNumber = String.valueOf(paramMap.get("telNumber"));
+		String phoneNumber = String.valueOf(paramMap.get("phoneNumber"));
+		String revenue = String.valueOf(paramMap.get("revenue"));
+		Map<String, Object> map = new HashMap<String, Object>();
+		String id = String.valueOf(paramMap.get("id"));
+		int count = 0;
+		String sql = "update tb_company set channel_id='"+channel+"',company_name='"+company+
+				"',USER_NAME='"+contacts+"',TELPHONE_NUM='"+telNumber+"',PHONE_NUM='"+phoneNumber+"',COMPANY_REVENUE='"+revenue+"' where ID='"+id+"'";
+		try {
+			count = jdbcTemplate.update(sql);
+		} catch(RuntimeException e) {
+			if(e.getMessage().contains("ORA-02291")){
+				map.put("info", "不存在");
+				return jacksonUtil.toJson(map);
+			}
+			if(e.getMessage().contains("ORA-00001")){
+				map.put("info", "重复添加");
+				return jacksonUtil.toJson(map);
+			}
+		}
+		if(count>0){
+			map.put("info", "修改成功");
+		}else{
+			map.put("info", "修改失败");
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public String delqy(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String id = String.valueOf(paramMap.get("id"));
+		String[] ids = id.split(",");
+		String is = "";
+		String num = "";
+		int count = 0;
+		for (int i = 0; i < ids.length; i++) {
+			String cx="select cow.COMPANY_ID,com.company_name from TB_CAR_OWNER cow,tb_company com where cow.COMPANY_ID=com.id and cow.COMPANY_ID='"+ids[i]+"'";
+			List<Map<String, Object>> list = jdbcTemplate.queryForList(cx);	
+			if(list.size()>0){
+				if(!String.valueOf(list.get(0).get("company_name")).equals("null")){				
+					num +=list.get(0).get("company_name").toString()+",";
+				}
+			}else{				
+				is += "'"+ids[i]+"',";
+			}
+		}
+		Map<String, String> map = new HashMap<String, String>();
+		if(!is.equals("")){			
+			String sql ="delete from tb_company where ID in ("+is.substring(0, is.length()-1)+")";
+			count = jdbcTemplate.update(sql);
+			System.out.println(sql);
+
+			if(count>0){
+				map.put("info", "删除成功");
+			}else{
+				map.put("info", "删除失败");
+			}
+		}
+		if(!num.equals("")){
+			map.put("info", "部分数据删除失败");
+			map.put("num", num);
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public int findMaxId(String table,String id){
+		int id1 = 1;
+		String sql = "select "+id+" from "+table+"  order by to_number("+id+") desc";
+		System.out.println("findMaxId sql="+sql);
+		List<Map<String, Object>> list = null;
+		list = jdbcTemplate.queryForList(sql);
+		if(list.size()>0){
+			id1 = Integer.parseInt(list.get(0).get(id).toString())+1;
+		}
+		return id1;
+	}
+
+}

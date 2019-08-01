@@ -1,0 +1,189 @@
+package mvc.service;
+
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import helper.JacksonUtil;
+
+import org.codehaus.jackson.type.TypeReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+
+
+@Service
+public class jsyshServer {
+	protected JdbcTemplate jdbcTemplate = null;
+
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+	@Autowired
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+	private String findsql(String power_option){
+		if(power_option!=null&&power_option.length()>0&&!power_option.equals("null")){		
+			String[] a = power_option.split("\\|");
+			String sql = "";
+			if(a[0].equals("1")){
+				sql += " and c.chaid= '"+a[1]+"'";
+			}else if(a[0].equals("2")){
+				sql += " and c.comid= '"+a[1]+"'";
+			}else if(a[0].equals("3")){
+				sql += " and c.cowid= '"+a[1]+"'";
+			}else if(a[0].equals("4")){
+				sql += " and c.vehid= '"+a[1]+"'";
+			}
+			return sql;
+		}
+		return "";
+	}
+	private JacksonUtil jacksonUtil = JacksonUtil.buildNormalBinder();
+	public List<Map<String, Object>> findsh(String postData,String power_option){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String province = String.valueOf(paramMap.get("province"));
+		String city = String.valueOf(paramMap.get("city"));
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String choose = String.valueOf(paramMap.get("choose"));
+		String choosed = String.valueOf(paramMap.get("choosed"));
+		String issh = String.valueOf(paramMap.get("issh"));
+		String sql ="select c.* from (select t.*,b.* from (select * from tb_driver_register x where add_time = (select max(add_time) from tb_driver_register y where x.id_card=y.id_card)) t";
+		sql += " left join (select veh.vehicle_no vehicle,veh.type,cow.owner_name,cha.channel_name,cha.province,cha.city,com.company_name,cha.id chaid,com.id comid,cow.id cowid,veh.id vehid"
+				+ " from TB_CAR_OWNER cow,tb_channel cha,tb_company com,tb_vehicle veh "
+				+ "where veh.OWNER_ID=cow.ID and cow.company_id=com.id and com.channel_id=cha.id ";
+		sql +=" ) b on b.vehicle=t.vehicle_no order by case when t.issh='2' then 1 when t.issh='0' then 2 when t.issh='1' then 3 when t.issh='3' then 4 end,add_time desc) c where 1=1" ;
+		if(province!=null&&province.length()>0&&!province.equals("null")&&!province.equals("省份")){
+			sql += " and c.province= '"+province+"'";
+		}
+		if(city!=null&&city.length()>0&&!city.equals("null")&&!city.equals("地级市")){
+			sql += " and c.city= '"+city+"'";
+		}
+		if(channel!=null&&channel.length()>0&&!channel.equals("null")){
+			sql += " and c.chaid= '"+channel+"'";
+		}
+		if(company!=null&&company.length()>0&&!company.equals("null")){
+			sql += " and c.comid= '"+company+"'";
+		}
+		if(choosed!=null&&choosed.length()>0&&!choosed.equals("null")){
+			if(choose.equals("TB_CAR_OWNER")){
+				sql += " and c.cowid= '"+choosed+"'";
+			}else if(choose.equals("TB_VEHICLE")){
+				sql += " and c.vehid= '"+choosed+"'";
+			}	
+		}
+		if(issh!=null&&issh.length()>0&&!issh.equals("null")){
+			sql += " and c.issh= '"+issh+"'";
+		}
+		sql +=findsql(power_option);
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		return list;
+	}
+	public String findshb(int pageIndex,int pageSize,String postData,String power_option){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String province = String.valueOf(paramMap.get("province"));
+		String city = String.valueOf(paramMap.get("city"));
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String choose = String.valueOf(paramMap.get("choose"));
+		String choosed = String.valueOf(paramMap.get("choosed"));
+		String issh = String.valueOf(paramMap.get("issh"));
+		String sql ="select a.* from ( select rownum rn ,c.* from (select t.*,b.* from (select * from tb_driver_register x where add_time = (select max(add_time) from tb_driver_register y where x.id_card=y.id_card)) t";
+		sql += " left join (select veh.vehicle_no vehicle,veh.type,cow.owner_name,cha.channel_name,cha.province,cha.city,com.company_name,cha.id chaid,com.id comid,cow.id cowid,veh.id vehid"
+				+ " from TB_CAR_OWNER cow,tb_channel cha,tb_company com,tb_vehicle veh "
+				+ "where veh.OWNER_ID=cow.ID and cow.company_id=com.id and com.channel_id=cha.id ";
+		sql +=" ) b on b.vehicle=t.vehicle_no order by case when t.issh='2' then 1 when t.issh='0' then 2 when t.issh='1' then 3 when t.issh='3' then 4 end,add_time desc) c where 1=1" ;
+		if(province!=null&&province.length()>0&&!province.equals("null")&&!province.equals("省份")){
+			sql += " and c.province= '"+province+"'";
+		}
+		if(city!=null&&city.length()>0&&!city.equals("null")&&!city.equals("地级市")){
+			sql += " and c.city= '"+city+"'";
+		}
+		if(channel!=null&&channel.length()>0&&!channel.equals("null")){
+			sql += " and c.chaid= '"+channel+"'";
+		}
+		if(company!=null&&company.length()>0&&!company.equals("null")){
+			sql += " and c.comid= '"+company+"'";
+		}
+		if(choosed!=null&&choosed.length()>0&&!choosed.equals("null")){
+			if(choose.equals("TB_CAR_OWNER")){
+				sql += " and c.cowid= '"+choosed+"'";
+			}else if(choose.equals("TB_VEHICLE")){
+				sql += " and c.vehid= '"+choosed+"'";
+			}	
+		}
+		if(issh!=null&&issh.length()>0&&!issh.equals("null")){
+			sql += " and c.issh= '"+issh+"'";
+		}
+		sql +=findsql(power_option);
+		sql +=" and rownum <= "+(pageIndex*pageSize)+") a where a.rn >"+((pageIndex-1)*pageSize);
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);	
+		return jacksonUtil.toJson(list);
+	}
+	
+	public String editsh(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String examine = String.valueOf(paramMap.get("examine"));
+		String id = String.valueOf(paramMap.get("id"));
+		String note = String.valueOf(paramMap.get("note"));
+		Map<String, Object> map = new HashMap<String, Object>();
+		if(examine.equals("0")){
+			String cx ="select * from tb_driver_register where ISSH='0' and id_card in (select id_card from tb_driver_register where id='"+id+"' and id_card is not null)";
+			 List<Map<String, Object>> list = jdbcTemplate.queryForList(cx);
+			if(list.size()>0){
+				map.put("info", "2");
+				return jacksonUtil.toJson(map);
+			}
+		}
+		int count = 0;
+		String sql = "update tb_driver_register set ISSH='"+examine+"',NOTE='"+note+"' where ID='"+id+"'";
+		try {
+			count = jdbcTemplate.update(sql);
+		} catch(RuntimeException e) {
+		}
+		if(count>0){
+			map.put("info", "0");
+		}else{
+			map.put("info", "1");
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public String delsh(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String id = String.valueOf(paramMap.get("id"));
+		String[] ids = id.split(",");
+		String is = "";
+		int count = 0;
+		for (int i = 0; i < ids.length; i++) {
+			is += "'"+ids[i]+"',";
+		}
+		String sql ="delete from tb_driver_register where id in ("+is.substring(0, is.length()-1)+")";
+		count = jdbcTemplate.update(sql);
+		System.out.println(sql);
+		Map<String, String> map = new HashMap<String, String>();
+		if(count>0){
+			map.put("info", "删除成功");
+		}else{
+			map.put("info", "删除失败");
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public int findMaxId(String table,String id){
+		int id1 = 1;
+		String sql = "select "+id+" from "+table+"  order by to_number("+id+") desc";
+		System.out.println("findMaxId sql="+sql);
+		List<Map<String, Object>> list = null;
+		list = jdbcTemplate.queryForList(sql);
+		if(list.size()>0){
+			id1 = Integer.parseInt(list.get(0).get(id).toString())+1;
+		}
+		return id1;
+	}
+
+}

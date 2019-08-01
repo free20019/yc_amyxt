@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>车载按摩垫管理系统</title>
+	<link rel="shortcut icon" href="#" />
+	<link rel="stylesheet" href="resources/style/reset.css">
+	<link rel="stylesheet" href="resources/style/iconfont.css">
+	<link rel="stylesheet" href="resources/script/bootstrap/css/bootstrap.css">
+	<style>
+		html, body {
+			height: 100%;
+		}
+		.mainPanel {
+			overflow-y: hidden;
+			position: absolute;
+			top: 50px;
+			width: 100%;
+			height: calc(100% - 50px);
+			margin: 0;
+			padding: 0;
+		}
+		.layout {
+			display: inline-flex;
+		}
+		.layout > .sidebar {
+			width: 200px;
+			height: 100%;
+			background: #008ac3;
+		}
+		.layout > .content {
+			width: calc(100% - 200px);
+			height: 100%;
+			background: #ffffff;
+		}
+
+		/*nav*/
+		.nav li > a i {
+			margin-right: 6px;
+		}
+		.subMenuPanel.active {
+			background: #0170a2;
+		}
+		.nav .nav-title,
+		.childrenPanel .nav-title {
+			color: #ffffff;
+		}
+		.childrenPanel .nav-title {
+			position: relative;
+			display: block;
+			padding: 7px 10px 7px 35px;
+			text-decoration: none;
+		}
+		.nav > li > .nav-title {
+			border-bottom: 1px solid #135583;
+		}
+		.nav .active > .nav-title, .nav .nav-title:hover, .nav .nav-title:focus {
+			color: #ffffff;
+			background: #04a2ea;
+		}
+		.childrenPanel {
+			border-bottom: 1px solid #135583;
+		}
+		.childrenPanel .nav-title {
+			position: relative;
+		}
+		.childrenPanel li.active .nav-title {
+			background: rgba(4, 162, 234, 1);
+		}
+		.childrenPanel li.active .nav-title:before {
+			content: '';
+			position: absolute;
+			top: 0;
+			right: 0;
+			display: block;
+			width: 4px;
+			height: 100%;
+			background: #144d7d;
+		}
+
+		/*tab*/
+		.content-tabs {
+			padding: 0 0 0 1px;
+			border-top: 1px solid #e7eaec;
+			border-bottom: solid 2px #2f4050;
+			background: #ffffff;
+		}
+		.content-tabs .page-tabs-content {
+			float: left;
+			width: 100%;
+		}
+		.content-tabs a {
+			display: block;
+			float: left;
+			border-right: solid 1px #eee;
+			padding: 6px 15px 5px;
+			color: #999999;
+		}
+		.menuTab_item {
+			text-decoration: none;
+			-webkit-transition: all .3s ease-out 0s;
+			transition: all .3s ease-out 0s;
+			cursor: pointer;
+		}
+		.menuTab_item:hover {
+			text-decoration: none;
+			color: #777777;
+			background: #f2f2f2;
+		}
+		.menuTab_item .glyphicon-remove {
+			font-size: 12px;
+		}
+		.menuTab_item.active {
+			color: #a7b1c2;
+			background: #2f4050;
+		}
+		.menuTab_item .glyphicon-remove:hover {
+			color: #cc0000;
+		}
+		.menuTab_item.active .glyphicon-remove:hover {
+			color: #ffffff;
+		}
+		.content-panels {
+			height: 100%;
+			padding: 0;
+		}
+	</style>
+</head>
+<body>
+<nav class="navbar" style="margin-bottom: 0; border-radius: 0; color: #ffffff; background: #0063a7;">
+	<div class="navbar-text navbar-left" style=" margin-bottom: 7px;">
+		<h3 style="margin: 0;">车载按摩垫管理系统</h3>
+	</div>
+	<div class="navbar-text navbar-right" style="margin-right: 15px;">
+		<a class="navbar-link" id="edit-user" style="margin-left: 20px; color: #fff;">欢迎:<span id="user_name"></a>
+		<a href="login.html" class="navbar-link" style="margin-left: 20px; color: #fff;">退出</a>
+	</div>
+</nav>
+<div class="container-fluid mainPanel layout">
+	<div class="sidebar">
+		<ul class="nav side-menu" id="index-sideMenu">
+		</ul>
+	</div>
+	<div class="content">
+		<div class="container-fluid content-tabs">
+			<div class="page-tabs-content" id="indexTabsContent">
+				<!--<a class="menuTab_item active">
+					<span>维修记录</span>
+					<i class="glyphicon glyphicon-remove"></i>
+				</a>-->
+			</div>
+		</div>
+		<div class="container-fluid content-panels" id="indexContentPanels">
+		</div>
+	</div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="userEdit-editUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+					aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">用户信息</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" style="padding-right: 50px;">
+					<div class="form-group">
+						<label for="userName" class="col-sm-2 control-label">用户名</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="userName" placeholder="用户名" disabled="disabled">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="password" class="col-sm-2 control-label">密码</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="password" placeholder="密码">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="contactInfomation" class="col-sm-2 control-label">姓名</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="contactInfomation" placeholder="姓名">
+						</div>
+					</div>
+						<div class="form-group">
+						<label for="edit_power" class="col-sm-2 control-label">权限</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="edit_power" placeholder="权限" disabled="disabled">
+						</div>
+					</div>
+						<div class="form-group">
+						<label for="edit_option" class="col-sm-2 control-label">操作对象</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="edit_option" placeholder="操作对象" disabled="disabled">
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="userEdit-save">修改</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="resources/script/jquery-1.12.1.min.js"></script>
+<script src="resources/script/bootstrap/js/bootstrap.js"></script>
+<script src="resources/script/layer/layer.js"></script>
+<script src="resources/script/util.js"></script>
+<script>
+	(function ($) {
+		var selectedMenuBtn = null;
+		var prevCheckTabItem = null;
+// 		var menu;
+// 		var menu = [
+// 			{
+// 				id: 'wxManagement', name: '维修管理', icon: 'icon-wxgl', displayState: true, children: [
+// 					{id: 'wxServer', name: '维修记录', icon: 'icon-wxjl', active: true, src: './app/html/wxServer.html'},
+// 					{id: 'wxTrips', name: '维修车次', icon: 'icon-wxcc', src: './app/html/wxTrips.html'},
+// 					{id: 'shMaintain', name: '维修审核', icon: 'icon-wxsh', src: './app/html/shMaintain.html'},
+// 					{id: 'dhHappen', name: '电话回访', icon: 'icon-dhhf', src: './app/html/dhHappen.html'}
+// 				]
+// 			},
+// 			{
+// 				id: 'whManagement', name: '维护管理', icon: 'icon-whgl', children: [
+// 					{id: 'ddMaintain', name: '地点维护', icon: 'icon-ddwh', src: './app/html/ddMaintain.html'},
+// 					{id: 'lxMaintain', name: '类型维护', icon: 'icon-wxlx', src: './app/html/lxMaintain.html'},
+// 					{id: 'nrMaintain', name: '内容维护', icon: 'icon-wxjl', src: './app/html/nrMaintain.html'},
+// 					{id: 'gzMaintain', name: '故障维护', icon: 'icon-gzwh', src: './app/html/gzMaintain.html'}
+// 				]
+// 			},
+// 			{id: 'userInfo', name: '用户名', icon: 'icon-yhgl', src: './app/html/userInfo.html'},
+// 			{id: 'competence', name: '权限', icon: 'icon-qxgl', src: './app/html/competence.html'}
+// 		];
+
+
+		var menuItemActive = null;
+
+		function setMenuHtml(data) {
+			var html = [];
+			$.each(data, function (index, item) {
+				var tagLi = $('<li></li>').data('database', item);
+				var tagA = $('<a href="javascript:void(0);" data-skip="'+item.id+'" class="nav-title"></a>');
+				var iconfont = $('<i class="iconfont '+item.icon+'"></i>');
+				var title = $('<span class="nav-label">'+item.name+'</span>');
+				var tagUl = $('<ul class="childrenPanel"></ul>').hide();
+				tagLi.append(tagA);
+				tagA.append(iconfont);
+				tagA.append(title);
+				if (item&&item.active) menuItemActive = item.id;
+				if(item&&item.children){
+					tagLi.append(tagUl);
+					tagLi.addClass('subMenuPanel');
+					if (item.displayState) tagUl.show();
+					var liList = setMenuHtml(item.children);
+					$.each(liList, function (i, dataItem) {
+						tagUl.append(dataItem);
+					});
+				}
+				html.push(tagLi);
+			});
+			return html;
+		}
+
+		/*菜单栏点击事件*/
+		function setEvent() {
+			$('#index-sideMenu').find('.nav-title').off('click').on('click', function () {
+				prevCheckTabItem = $(this).attr('data-skip');
+				var item = $(this).parent().data('database');
+				var tabsPanels = $('#indexTabsContent');
+				var contentPanels = $('#indexContentPanels');
+
+				/*判断是否有二级菜单*/
+				if ($(this).parent().hasClass('subMenuPanel')) {
+					$(this).parent().addClass('active').siblings('.active').removeClass('active');
+					$(this).parent().siblings('.subMenuPanel').find('ul.childrenPanel').hide();
+					$(this).next().show();
+				} else {
+					tabsPanels.find('.active').removeClass('active');
+					contentPanels.find('iframe').hide();
+
+					var childrenPanel = $(this).parent().parent();
+					/*把记录的二级菜单 清除选中状态*/
+					if (selectedMenuBtn) {
+						$('[data-skip=' + selectedMenuBtn + ']').parent().removeClass('active');
+						selectedMenuBtn = null;
+					}
+					/*判断是否是二级菜单 把二级菜单记录下来*/
+					if (childrenPanel[0].className.indexOf('childrenPanel') >= 0) selectedMenuBtn = prevCheckTabItem;
+
+					$(this).parent().addClass('active').siblings('.active').removeClass('active').find('.childrenPanel').hide().find('.active').removeClass('active');
+
+					/*判断是否打开连接*/
+					if (contentPanels.find('#' + item.id).length > 0) {
+						tabsPanels.find('.menuTab_item[data-remove=' + item.id + ']').addClass('active');
+						contentPanels.find('#' + item.id).show();
+					} else {
+						$('<a class="menuTab_item active" data-remove="' + item.id + '"><span>' + item.name + '</span><i class="glyphicon glyphicon-remove"></i></a>').appendTo('#indexTabsContent');
+						$('<iframe name="iframe' + contentPanels.length + '" width="100%" src="' + item.src + '" frameborder="0" id="' + item.id + '" style="display: block; height: calc(100% - 33px);"></iframe>').appendTo('#indexContentPanels');
+					}
+				}
+				/*菜单栏-标签卡点击事件*/
+				$('.menuTab_item').off('click').on('click', function () {
+					$(this).addClass('active').siblings('.active').removeClass('active');
+					$('#indexContentPanels iframe').hide();
+					$('#indexContentPanels #' + $(this).attr('data-remove')).show();
+					prevCheckTabItem = $(this).attr('data-remove');
+				});
+				/*菜单栏-标签卡的删除事件*/
+				$('.menuTab_item i.glyphicon-remove').off('click').on('click', function () {
+					event.stopPropagation();
+					var id = $(this).parent().attr('data-remove');
+					var content = $('#indexContentPanels #' + id);
+					if (prevCheckTabItem && id !== prevCheckTabItem) {
+						$('.menuTab_item[data-remove=' + prevCheckTabItem + ']').addClass('active');
+						$('#indexContentPanels #' + prevCheckTabItem).show();
+					} else {
+						if (content.prev().length > 0) {
+							prevCheckTabItem = $(this).parent().prev().addClass('active').attr('data-remove');
+							content.prev().show();
+						} else if (content.next().length > 0) {
+							prevCheckTabItem = $(this).parent().next().addClass('active').attr('data-remove');
+							content.next().show()
+						}
+					}
+					$(this).parent().remove();
+					content.remove();
+				});
+			});
+		}
+
+		function initMenu() {
+			 $.ajax({
+				 type: "POST",
+				url: "login/index",
+				data:{},
+				timeout : 180000,
+				dataType: 'json',
+				success:function(data){
+					$("#user_name").each(function() {
+						$(this).html(data.realname);
+					});
+					$("#userName").val(data.username);
+					$("#password").val(data.user_pwd);
+					$("#contactInfomation").val(data.realname);
+					$("#edit_option").val(data.option_name=="null"?"":data.option_name);
+					$("#edit_power").val(data.power_name);
+					menu = eval(data.info);
+					$.each(setMenuHtml(menu), function (index, item) {
+						$(item).appendTo('#index-sideMenu');
+					});
+					setEvent();
+					if (menuItemActive) {
+						$('#index-sideMenu a[data-skip=' + menuItemActive + ']').trigger('click');
+					}
+				},
+				error: function(XMLHttpRequest, textStatus, errorThrown) {
+				}         
+			});
+		}
+		function editUser() {
+			 $.ajax({
+				 type: "POST",
+				url: "login/editUser",
+				data:'postData={"user_name":"'+$('#userName').val()+
+					'","user_pwd":"'+$('#password').val()+
+					'","real_name":"'+$('#contactInfomation').val()+
+				'"}',
+				timeout : 180000,
+				dataType: 'json',
+				success:function(data){
+					if(data.info=='重复添加'){
+						layer.msg('用户名重复');
+					}else if(data.info=='修改成功'){
+						$('#userEdit-editUser').modal('hide');
+						alert("修改成功,请重新登录");
+						setTimeout(function(){ location.href = 'login.html'; }, 500);
+					}else{
+						layer.msg('修改失败');
+					}
+				},
+				error: function() {
+				}         
+			});
+		}
+		$(function () {
+			initMenu();
+		});
+		$('#edit-user').on('click', function() {
+			$('#userEdit-editUser').modal('show');
+			$('#userEdit-save').off('click').on('click', function () {
+				if($('#userName').val()==''){
+					layer.msg('用户名必须填写！');
+					return false;
+				}
+				if($('#password').val()==''){
+					layer.msg('密码必须填写！');
+					return false;
+				}
+				editUser();
+			});
+		})
+	})(jQuery);
+	window.setInterval("xt_2()",5000);
+	xt_2();
+	/**
+	* 心跳  每隔5秒钟执行
+	*/
+	function xt_2(){
+		$.ajax({
+	        type:"post",
+	        url: basePath+"login/xt2",
+	        data:{},
+	        dataType: "json",
+	        success:function(data){
+	        	if(data.code=='510'){
+                     window.location.href= basePath+"login.html";
+	        	}
+	        },
+	        error: function(){
+	        }         
+	     });
+	}
+</script>
+</body>
+</html>

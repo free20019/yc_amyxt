@@ -1,0 +1,212 @@
+package mvc.service;
+
+
+import java.util.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+
+
+
+
+
+
+import helper.JacksonUtil;
+
+import org.codehaus.jackson.type.TypeReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+
+
+@Service
+public class azServer {
+	protected JdbcTemplate jdbcTemplate = null;
+
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+	@Autowired
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	private JacksonUtil jacksonUtil = JacksonUtil.buildNormalBinder();
+	public List<Map<String, Object>> findaz(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String province = String.valueOf(paramMap.get("province"));
+		String city = String.valueOf(paramMap.get("city"));
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String choose = String.valueOf(paramMap.get("choose"));
+		String choosed = String.valueOf(paramMap.get("choosed"));
+		String sql = "select t.*,a.* from(select ins.id as INS_ID,ins.terminal_id, ins.terminal_num,ins.vehicle_id,ins.add_time,ter.TERMINAL_TYPE from TB_INSTALLATION ins,TB_TERMINAL ter where ins.TERMINAL_ID=ter.ID ) t"
+				+ " left join (select cha.channel_name,cha.province,cha.city,com.company_name,cow.owner_name,veh.TYPE,veh.VEHICLE_NO,veh.ID "
+				+ " from tb_channel cha,tb_company com,TB_CAR_OWNER cow,tb_vehicle veh "
+				+ " where veh.OWNER_ID=cow.ID and cow.company_id=com.id and com.channel_id=cha.id ) a on a.ID=t.VEHICLE_ID where 1=1  ";
+		if(province!=null&&province.length()>0&&!province.equals("null")&&!province.equals("省份")){
+			sql += " and a.province= '"+province+"'";
+		}
+		if(city!=null&&city.length()>0&&!city.equals("null")&&!city.equals("地级市")){
+			sql += " and a.city= '"+city+"'";
+		}
+		if(channel!=null&&channel.length()>0&&!channel.equals("null")){
+			sql += " and a.id= '"+channel+"'";
+		}
+		if(company!=null&&company.length()>0&&!company.equals("null")){
+			sql += " and a.id= '"+company+"'";
+		}
+		if(choosed!=null&&choosed.length()>0&&!choosed.equals("null")){
+			if(choose.equals("TB_CAR_OWNER")){
+				sql += " and a.id= '"+choosed+"'";
+			}else if(choose.equals("TB_VEHICLE")){
+				sql += " and a.id= '"+choosed+"'";
+			}else if(choose.equals("TB_TERMINAL")){
+				sql += " and t.terminal_id= '"+choosed+"'";
+			}		
+		}
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);	
+		return list;
+	}
+	public String findazb(int pageIndex,int pageSize,String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String province = String.valueOf(paramMap.get("province"));
+		String city = String.valueOf(paramMap.get("city"));
+		String channel = String.valueOf(paramMap.get("channel"));
+		String company = String.valueOf(paramMap.get("company"));
+		String choose = String.valueOf(paramMap.get("choose"));
+		String choosed = String.valueOf(paramMap.get("choosed"));
+		String sql = "select b.* from ( select rownum rn,aa.* from (select t.*,a.* from (select ins.id as INS_ID,ins.terminal_id, ins.terminal_num,ins.vehicle_id,ins.add_time,ter.TERMINAL_TYPE from TB_INSTALLATION ins,TB_TERMINAL ter where ins.TERMINAL_ID=ter.ID ) t"
+				+ " left join (select cha.channel_name,cha.province,cha.city,com.company_name,cow.owner_name,veh.TYPE,veh.VEHICLE_NO,veh.ID,veh.OWNER_ID,cow.company_id,com.channel_id"
+				+ " from tb_channel cha,tb_company com,TB_CAR_OWNER cow,tb_vehicle veh "
+				+ " where veh.OWNER_ID=cow.ID and cow.company_id=com.id and com.channel_id=cha.id ) a on a.ID=t.VEHICLE_ID ) aa where 1=1 ";
+		if(province!=null&&province.length()>0&&!province.equals("null")&&!province.equals("省份")){
+			sql += " and aa.province= '"+province+"'";
+		}
+		if(city!=null&&city.length()>0&&!city.equals("null")&&!city.equals("地级市")){
+			sql += " and aa.city= '"+city+"'";
+		}
+		if(channel!=null&&channel.length()>0&&!channel.equals("null")){
+			sql += " and aa.channel_id= '"+channel+"'";
+		}
+		if(company!=null&&company.length()>0&&!company.equals("null")){
+			sql += " and aa.company_id= '"+company+"'";
+		}
+		if(choosed!=null&&choosed.length()>0&&!choosed.equals("null")){
+			if(choose.equals("TB_CAR_OWNER")){
+				sql += " and aa.OWNER_ID= '"+choosed+"'";
+			}else if(choose.equals("TB_VEHICLE")){
+				sql += " and aa.vehicle_id= '"+choosed+"'";
+			}else if(choose.equals("TB_TERMINAL")){
+				sql += " and aa.terminal_id= '"+choosed+"'";
+			}		
+		}
+		sql +=" and rownum <= "+(pageIndex*pageSize) +") b where b.rn >"+((pageIndex-1)*pageSize)+" order by b.add_time";
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		return jacksonUtil.toJson(list);
+	}
+	public String findazzd(String terminal){
+		String sql="select * from TB_TERMINAL where ID = '"+terminal+"'";
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		String cx="select * from TB_INSTALLATION where terminal_id = '"+terminal+"'";
+		List<Map<String, Object>> list2 = jdbcTemplate.queryForList(cx);
+		if(list2.size()>0){
+			list.get(0).put("STATUS", "已安装");
+		}else{
+			list.get(0).put("STATUS", "未安装");
+		}
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("list", list);
+		return jacksonUtil.toJson(map);
+	}
+	public String addaz(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String terminal = String.valueOf(paramMap.get("terminal"));
+		String zd_id = String.valueOf(paramMap.get("zd_id"));
+		String vehicle = String.valueOf(paramMap.get("vehicle"));
+		int user_id = findMaxId("TB_INSTALLATION","ID");
+		int count = 0;
+		Map<String, Object> map = new HashMap<String, Object>();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		String date = df.format(new Date());// new Date()为获取当前系统时间，也可使用当前时间戳
+		String sql = "insert into TB_INSTALLATION (TERMINAL_ID,TERMINAL_NUM,VEHICLE_ID,ADD_TIME,id) values "
+			+ " ('"+zd_id+"','"+terminal+"','"+vehicle+"',to_date('"+date+"','yyyy-mm-dd hh24:mi:ss'),'"+user_id+"')";
+		try {
+			count = jdbcTemplate.update(sql);
+		} catch(RuntimeException e) {
+			if(e.getMessage().contains("ORA-02291")){
+				map.put("info", "不存在");
+				return jacksonUtil.toJson(map);
+			}
+		}
+		if(count>0){
+			map.put("info", "添加成功");
+		}else{
+			map.put("info", "添加失败");
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public String editaz(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String terminal = String.valueOf(paramMap.get("terminal"));
+		String zd_id = String.valueOf(paramMap.get("zd_id"));
+		String vehicle = String.valueOf(paramMap.get("vehicle"));
+		String id = String.valueOf(paramMap.get("id"));
+		int count = 0;
+		Map<String, Object> map = new HashMap<String, Object>();
+		String sql = "update TB_INSTALLATION set VEHICLE_ID='"+vehicle+"', TERMINAL_ID='"+zd_id+"',TERMINAL_NUM='"+terminal+"' where ID='"+id+"'";
+		try {
+			count = jdbcTemplate.update(sql);
+		} catch(RuntimeException e) {
+			if(e.getMessage().contains("ORA-02291")){
+				map.put("info", "不存在");
+				return jacksonUtil.toJson(map);
+			}
+		}
+		if(count>0){
+			map.put("info", "修改成功");
+		}else{
+			map.put("info", "修改失败");
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public String delaz(String postData){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String id = String.valueOf(paramMap.get("id"));
+		String[] ids = id.split(",");
+		String is = "";
+		int count = 0;
+		for (int i = 0; i < ids.length; i++) {
+			is += "'"+ids[i]+"',";
+		}
+		String sql ="delete from TB_INSTALLATION where ID in ("+is.substring(0, is.length()-1)+")";
+		count = jdbcTemplate.update(sql);
+		System.out.println(sql);
+		Map<String, String> map = new HashMap<String, String>();
+		if(count>0){
+			map.put("info", "删除成功");
+		}else{
+			map.put("info", "删除失败");
+		}
+		return jacksonUtil.toJson(map);
+	}
+	public int findMaxId(String table,String id){
+		int id1 = 1;
+		String sql = "select "+id+" from "+table+"  order by to_number("+id+") desc";
+		System.out.println("findMaxId sql="+sql);
+		List<Map<String, Object>> list = null;
+		list = jdbcTemplate.queryForList(sql);
+		if(list.size()>0){
+			id1 = Integer.parseInt(list.get(0).get(id).toString())+1;
+		}
+		return id1;
+	}
+
+}

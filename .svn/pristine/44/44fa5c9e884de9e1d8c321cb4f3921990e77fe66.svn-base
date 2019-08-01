@@ -1,0 +1,224 @@
+package mvc.service;
+
+
+import java.util.Date;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import helper.JacksonUtil;
+
+import org.codehaus.jackson.type.TypeReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+
+
+@Service
+public class qsServer {
+	protected JdbcTemplate jdbcTemplate = null;
+
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+	@Autowired
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+	private String findsql(String power_option){
+		if(power_option!=null&&power_option.length()>0&&!power_option.equals("null")){		
+			String[] a = power_option.split("\\|");
+			String sql = "";
+			if(a[0].equals("1")){
+				sql += " and cha.id= '"+a[1]+"'";
+			}else if(a[0].equals("2")){
+				sql += " and com.id= '"+a[1]+"'";
+			}else if(a[0].equals("3")){
+				sql += " and cow.id= '"+a[1]+"'";
+			}else if(a[0].equals("4")){
+				sql += " and veh.id= '"+a[1]+"'";
+			}
+			return sql;
+		}
+		return "";
+	}
+	private JacksonUtil jacksonUtil = JacksonUtil.buildNormalBinder();
+	public List<Map<String, Object>> findqs(String postData,String power_option){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String time = String.valueOf(paramMap.get("time"));
+		String sql = "select distinct t.*,ord.count,ord.TOTAL_FEE from (select cow.owner_name,cha.channel_name,cha.province,cha.city,cha.channel_revenue,com.company_name,com.company_revenue,veh.TYPE,veh.VEHICLE_NO,ter.TERMINAL_TYPE ,ter.TERMINAL_NUM"
+				+ " from TB_CAR_OWNER cow,tb_channel cha,tb_company com,tb_vehicle veh,TB_INSTALLATION ins,TB_TERMINAL ter"
+				+ " where ter.TERMINAL_NUM in (select MDT_NO from tb_order where status='1'";
+		
+		if(time!=null&&time.length()>0&&!time.equals("null")){
+			sql += " and  To_Char(UPTIME, 'yyyy-mm-dd') like '"+time+"%'";
+		}
+		sql +=" ) and ter.ID =ins.TERMINAL_ID and veh.ID=ins.VEHICLE_ID and veh.OWNER_ID=cow.ID and cow.company_id=com.id and com.channel_id=cha.id";
+		sql +=findsql(power_option);
+		sql +=" ) t left join (select count(mdt_no) count,mdt_no,sum(TOTAL_FEE) TOTAL_FEE from tb_order group by mdt_no) ord on ord.mdt_no=t.TERMINAL_NUM";
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		if(list.size()>0){
+			BigDecimal numall=new BigDecimal(0);
+			BigDecimal numaall=new BigDecimal(0);
+			BigDecimal numball=new BigDecimal(0);
+			BigDecimal numcall=new BigDecimal(0);
+			for(int i=0;i<list.size();i++){
+				list.get(i).put("owner_revenue", "30%");
+				if(!String.valueOf(list.get(i).get("TOTAL_FEE")).equals("null")){
+					BigDecimal num=new BigDecimal ((list.get(i).get("TOTAL_FEE")).toString());
+					BigDecimal d=new BigDecimal (100);					
+					if(!String.valueOf(list.get(i).get("channel_revenue")).equals("null")){
+						BigDecimal a=new BigDecimal ((list.get(i).get("channel_revenue")).toString().replace("%", ""));
+						BigDecimal numa=num.multiply(a).divide(d).divide(d);
+						list.get(i).put("numa", numa);
+						numaall=numaall.add(numa);
+					}
+					if(!String.valueOf(list.get(i).get("company_revenue")).equals("null")){
+						BigDecimal b=new BigDecimal ((list.get(i).get("company_revenue")).toString().replace("%", ""));	
+						BigDecimal numb=num.multiply(b).divide(d).divide(d);
+						list.get(i).put("numb", numb);
+						numball=numball.add(numb);
+					}
+					if(!String.valueOf(list.get(i).get("owner_revenue")).equals("null")){
+						BigDecimal c=new BigDecimal ((list.get(i).get("owner_revenue")).toString().replace("%", ""));	
+						BigDecimal numc=num.multiply(c).divide(d).divide(d);
+						list.get(i).put("numc", numc);
+						numcall=numcall.add(numc);
+					}
+					num=num.divide(d);		
+					list.get(i).put("num",num);
+					numall=numall.add(num);
+				}
+				list.get(i).put("numall",numall);
+				list.get(i).put("numaall",numaall);
+				list.get(i).put("numball",numball);
+				list.get(i).put("numcall",numcall);
+			}
+		}
+		return list;
+	}
+	public List<Map<String, Object>> findqs2(String postData,String power_option){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String time = String.valueOf(paramMap.get("time"));
+		String sql = "select distinct t.*,ord.count,ord.TOTAL_FEE from (select cow.owner_name,cha.channel_name,cha.province,cha.city,cha.channel_revenue,com.company_name,com.company_revenue,veh.TYPE,veh.VEHICLE_NO,ter.TERMINAL_TYPE ,ter.TERMINAL_NUM"
+				+ " from TB_CAR_OWNER cow,tb_channel cha,tb_company com,tb_vehicle veh,TB_INSTALLATION ins,TB_TERMINAL ter"
+				+ " where ter.TERMINAL_NUM in (select MDT_NO from tb_order where status='1'";
+		
+		if(time!=null&&time.length()>0&&!time.equals("null")){
+			sql += " and  To_Char(UPTIME, 'yyyy-mm-dd') like '"+time+"%'";
+		}
+		sql +=" ) and ter.ID =ins.TERMINAL_ID and veh.ID=ins.VEHICLE_ID and veh.OWNER_ID=cow.ID and cow.company_id=com.id and com.channel_id=cha.id";
+		sql +=findsql(power_option);
+		sql +=" ) t left join (select count(mdt_no) count,mdt_no,sum(TOTAL_FEE) TOTAL_FEE from tb_order group by mdt_no) ord on ord.mdt_no=t.TERMINAL_NUM";
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		Map<String, Object> map=new HashMap<String, Object>();
+		int count=0;
+		if(list.size()>0){
+			BigDecimal numall=new BigDecimal(0);
+			BigDecimal numaall=new BigDecimal(0);
+			BigDecimal numball=new BigDecimal(0);
+			BigDecimal numcall=new BigDecimal(0);
+			for(int i=0;i<list.size();i++){
+				list.get(i).put("owner_revenue", "30%");
+				if(!String.valueOf(list.get(i).get("TOTAL_FEE")).equals("null")){
+					BigDecimal num=new BigDecimal ((list.get(i).get("TOTAL_FEE")).toString());
+					BigDecimal d=new BigDecimal (100);					
+					if(!String.valueOf(list.get(i).get("channel_revenue")).equals("null")){
+						BigDecimal a=new BigDecimal ((list.get(i).get("channel_revenue")).toString().replace("%", ""));
+						BigDecimal numa=num.multiply(a).divide(d).divide(d);
+						list.get(i).put("numa", numa);
+						numaall=numaall.add(numa);
+					}
+					if(!String.valueOf(list.get(i).get("company_revenue")).equals("null")){
+						BigDecimal b=new BigDecimal ((list.get(i).get("company_revenue")).toString().replace("%", ""));	
+						BigDecimal numb=num.multiply(b).divide(d).divide(d);
+						list.get(i).put("numb", numb);
+						numball=numball.add(numb);
+					}
+					if(!String.valueOf(list.get(i).get("owner_revenue")).equals("null")){
+						BigDecimal c=new BigDecimal ((list.get(i).get("owner_revenue")).toString().replace("%", ""));	
+						BigDecimal numc=num.multiply(c).divide(d).divide(d);
+						list.get(i).put("numc", numc);
+						numcall=numcall.add(numc);
+					}
+					num=num.divide(d);		
+					list.get(i).put("num",num);
+					numall=numall.add(num);
+					
+					//统计
+					if(!String.valueOf(list.get(i).get("count")).equals("null")){
+						count +=Integer.valueOf(list.get(i).get("count").toString());
+					}
+					map.put("PROVINCE", "总营收");
+					map.put("COUNT", count);
+					map.put("num", numall);
+					map.put("numa", numaall);
+					map.put("numb", numball);
+					map.put("numc", numcall);
+				}
+				list.get(i).put("numall",numall);
+				list.get(i).put("numaall",numaall);
+				list.get(i).put("numball",numball);
+				list.get(i).put("numcall",numcall);
+			}
+		}
+		list.add(list.size(), map);
+		return list;
+	}
+	private int Integer(String string) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	public String findqsb(int pageIndex,int pageSize,String postData,String power_option){
+		Map<String, Object> paramMap = jacksonUtil.toObject(postData,new TypeReference<Map<String, Object>>() {});
+		String time = String.valueOf(paramMap.get("time"));
+		String sql = "select a.* from ( select distinct t.*,rownum as rn,ord.count,ord.TOTAL_FEE from (select cow.owner_name,cha.channel_name,cha.province,cha.city,cha.channel_revenue,com.company_name,com.company_revenue,veh.TYPE,veh.VEHICLE_NO,ter.TERMINAL_TYPE ,ter.TERMINAL_NUM"
+				+ " from TB_CAR_OWNER cow,tb_channel cha,tb_company com,tb_vehicle veh,TB_INSTALLATION ins,TB_TERMINAL ter"
+				+ " where ter.TERMINAL_NUM in (select MDT_NO from tb_order where status='1'";
+		
+		if(time!=null&&time.length()>0&&!time.equals("null")){
+			sql += " and  To_Char(UPTIME, 'yyyy-mm-dd') like '"+time+"%'";
+		}
+		sql +=" ) and ter.ID =ins.TERMINAL_ID and veh.ID=ins.VEHICLE_ID and veh.OWNER_ID=cow.ID and cow.company_id=com.id and com.channel_id=cha.id";
+		sql +=findsql(power_option);
+		sql +=" ) t left join (select count(mdt_no) count,mdt_no,sum(TOTAL_FEE) TOTAL_FEE from tb_order group by mdt_no) ord on ord.mdt_no=t.TERMINAL_NUM";
+		sql +=" where rownum <= "+(pageIndex*pageSize)+") a where a.rn >"+((pageIndex-1)*pageSize);
+		System.out.println(sql);
+		List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+		if(list.size()>0){
+			for(int i=0;i<list.size();i++){
+				list.get(i).put("owner_revenue", "30%");
+				if(!String.valueOf(list.get(i).get("TOTAL_FEE")).equals("null")){
+					BigDecimal num=new BigDecimal ((list.get(i).get("TOTAL_FEE")).toString());
+					BigDecimal d=new BigDecimal (100);					
+					if(!String.valueOf(list.get(i).get("channel_revenue")).equals("null")){
+						BigDecimal a=new BigDecimal ((list.get(i).get("channel_revenue")).toString().replace("%", ""));
+						BigDecimal numa=num.multiply(a).divide(d).divide(d);
+						list.get(i).put("numa", numa);
+					}
+					if(!String.valueOf(list.get(i).get("company_revenue")).equals("null")){
+						BigDecimal b=new BigDecimal ((list.get(i).get("company_revenue")).toString().replace("%", ""));	
+						BigDecimal numb=num.multiply(b).divide(d).divide(d);
+						list.get(i).put("numb", numb);
+					}
+					if(!String.valueOf(list.get(i).get("owner_revenue")).equals("null")){
+						BigDecimal c=new BigDecimal ((list.get(i).get("owner_revenue")).toString().replace("%", ""));	
+						BigDecimal numc=num.multiply(c).divide(d).divide(d);
+						list.get(i).put("numc", numc);
+					}
+					num=num.divide(d);		
+					list.get(i).put("num",num);
+				}
+			}
+		}
+		return jacksonUtil.toJson(list);
+	}
+
+}

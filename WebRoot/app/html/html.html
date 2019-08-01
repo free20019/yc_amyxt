@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       	<meta charset="utf-8">
+       	<title>html</title>
+		<link rel="stylesheet" href="../../resources/script/bootstrap/css/bootstrap.css">
+		<style>
+			html, body {
+				height: 100%;
+			}
+			.parent {
+            height:150px;
+            display:flex;
+            align-items:center;
+	        }
+	        .child {
+	            margin-left: 40px;
+	            
+	        }
+	        .child .panel-heading{
+	        	 background-color: #FFDEAD;
+	        	 
+	        }
+	        .child .panel-body{
+	        	 background-color: #337ab7;
+	        	 color: white;
+	        }
+	       	.parent .panel{
+	        	 width:250px;
+	        	 float:left;
+	        	 text-align: center;
+	        }
+	        .table {
+	        	margin-bottom: 0;
+	        	height: 100%;
+	        }
+	        .table > tbody > tr {
+	       		border-bottom: 1px solid #dddddd;
+	        }
+	        .table > thead:first-child > tr:first-child > th {
+	       		border: solid #dddddd;
+	       		border-width: 0 1px 1px 1px;
+	        }
+	        .table > tbody > tr > td {
+	        	height: 30px;
+	       		border: 1px solid #dddddd;
+	        	line-height: 30px;
+	        
+	        }
+	        .table > thead:first-child > tr:first-child > th:first-child,
+	        .table > tbody > tr > td:first-child {
+	       		border-left: none;
+	        }
+	        .table > thead:first-child > tr:first-child > th:last-child,
+	        .table > tbody > tr > td:last-child {
+	       		border-right: none;
+	        }
+		</style>
+   </head>
+<body>
+	<div class="container-fluid parent" >
+
+			<div class="panel panel-default child">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<span>故障</span>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<h1 class="panel-title">
+						<span>0</span>
+					</h1>
+				</div>
+			</div>
+
+			<div class="panel panel-default child">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<span>投诉</span>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<h3 class="panel-title">
+						<span>0</span>
+					</h3>
+				</div>
+			</div>
+			
+			<div class="panel panel-default child">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<span>事件</span>
+					</h3>
+				</div>
+				<div class="panel-body">
+					<h3 class="panel-title">
+						<span>0</span>
+					</h3>
+				</div>
+			</div>
+			<div class="child">
+				<button class="btn btn-primary btn-sm ip-iconfont ip-icon-search" onclick="findaz();">查询</button>
+				<button class="btn btn-primary btn-sm" id="azAdd" data-toggle="modal">添加</button>
+			</div>
+
+</div>
+<div class="container-fluid tableDiv" style="height: calc(100% - 150px); overflow-x: auto;">
+	<div class="panel panel-default" style="height: 100%;">
+		<div class="panel-heading"  style="background-color: #337ab7;color: white;">
+			<h3 class="panel-title">
+				<span>事件明细</span>
+			</h3>
+		</div>
+		<div class="panel-body" style="height: calc(100% - 40px)">
+			<table class="table" id="" >
+				<thead>
+				<tr>
+						<th width="90">序号</th>
+						<th width="130">姓名</th>
+						<th width="130">事由</th>
+						<th width="130">联系电话</th>
+						<th width="130">被投诉人</th>
+						<th width="130">备注</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+</script>
+</body>
+</html>

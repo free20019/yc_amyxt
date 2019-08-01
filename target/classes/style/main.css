@@ -1,0 +1,135 @@
+a {
+	text-decoration: none;
+}
+
+/*提示信息*/
+.form-prompt {color: #999999;}
+.form-prompt:before {content: '*';margin-right: 5px;}
+.form-control + .form-prompt {margin-left: .5em;}
+
+/*内容布局*/
+.layout {display: -webkit-inline-box;display: -ms-inline-flexbox;display: inline-flex;overflow-y: hidden;position: absolute;top: 0;width: 100%;height: 100%;margin: 0;padding: 0;}
+.layout > .panel-left {position: relative;width: 260px;height: 100%;border-right: 2px solid #eeeeee;background: #ffffff;}
+.layout > .panel-content {width: calc(100% - 260px);height: 100%;background: #ffffff;}
+.layout > .panel-right {position: relative;width: 260px;height: 100%;border-left: 2px solid #eeeeee;background: #ffffff;}
+
+/*进度条-进阶样式*/
+.progress-bar {position: relative;}
+.progress-bar .progress_handle {position: absolute;right: 0;display: none;width: 20px;height: 20px;margin-right: -10px;border-radius: 50%;-webkit-box-shadow: inset 1px 1px 8px 0 #c2c1c7;box-shadow: inset 1px 1px 8px 0 #c2c1c7;background: #e9f4fa;}
+.progress:hover .progress-bar .progress_handle {display: inline-block;}
+
+/*nav*/
+.nav {height: 100%;overflow-y: auto;}
+.nav > li > a i {margin-right: 6px;}
+.subMenuPanel.active {}
+.nav .nav-title, .childrenPanel .nav-title {border-bottom: 1px solid #eaeaea;color: #333333;}
+.nav-title .icon-arrow {position: absolute;top: 50%;right: 10px;margin-top: -11px;-webkit-animation: transform .3s;animation: transform .3s;}
+.active > .nav-title .icon-arrow {-webkit-transform: rotateZ(180deg);-ms-transform: rotate(180deg);transform: rotateZ(180deg);}
+.childrenPanel .nav-title {position: relative;display: block;padding: 7px 10px 7px 35px;text-decoration: none;}
+.nav .active > .nav-title, .nav > .nav-title:hover, .nav > .nav-title:focus {color: #ffffff;background: #0b82dc;}
+/*nav-children*/
+.childrenPanel {margin-bottom: 0;}
+.childrenPanel .nav-title {position: relative;padding-top: 5px;padding-bottom: 5px;border-bottom-style: dashed;}
+.childrenPanel li:last-child .nav-title {border-bottom-style: solid;}
+.childrenPanel li.active > .nav-title, .childrenPanel li > .nav-title:hover, .childrenPanel li > .nav-title:focus {color: #333; background: #fff;}
+.childrenPanel li.active > .nav-title:before, .childrenPanel li > .nav-title:hover:before, .childrenPanel li > .nav-title:focus:before {content: '';position: absolute;top: 0;left: 0;display: block;width: 4px;height: 100%;background: #337ab7;}
+.childrenPanel .childrenPanel li.active > .nav-title:before, .childrenPanel .childrenPanel li > .nav-title:hover:before, .childrenPanel .childrenPanel li > .nav-title:focus:before {width: 100%;border-width: 1px 4px;border-style: solid;border-color: #337ab7;background: transparent;}
+
+/*tab*/
+.content-tabs {padding: 0 0 0 1px;border-top: 1px solid #e7eaec;border-bottom: solid 1px #2c6694;background: #ffffff;}
+.content-tabs .page-tabs-content {float: left;width: 100%;}
+.content-tabs a {display: block;float: left;border-right: solid 1px #eee;padding: 6px 15px 5px;color: #999999;}
+.menuTab_item {text-decoration: none;-webkit-transition: all .3s ease-out 0s;-o-transition: all .3s ease-out 0s;transition: all .3s ease-out 0s;cursor: pointer;}
+.menuTab_item:hover {text-decoration: none;color: #777777;background: #f2f2f2;}
+.menuTab_item .glyphicon-remove {font-size: 12px;}
+.menuTab_item.active {color: #ffffff;background: #0b82dc;}
+.menuTab_item .glyphicon-remove:hover {color: #cc0000;}
+.menuTab_item.active .glyphicon-remove:hover {color: #ffffff;}
+.content-panels {height: 100%;padding: 0;}
+/*tabNavbar*/
+.tabPanel {height: 100%;}
+.tabNavbar {width: 100%;height: 39px; /*border-right: 1px solid #2c6694;*/border-bottom: 1px solid #2c6694;}
+.tabNavItem {float: left;min-width: 80px;height: 39px;line-height: 39px;padding-left: 10px;padding-right: 10px;text-align: center;list-style: none;cursor: pointer;}
+.tabNavItem.active {border-bottom: 2px solid #0270c7;}
+.tabContentPanels {height: calc(100% - 40px);}
+.tabContentPanel {position: relative;overflow-y: auto;height: 100%;}
+[data-type=tabPanel] {display: none;}
+
+/*查询面板*/
+.queryPanel {padding: 5px 10px;border-bottom: 1px solid #e6e6e6;}
+/*搜索框*/
+.searchForPanel {position: relative;height: 39px;border-bottom: 1px solid #d7d7d7;}
+.searchForPanel:before {content: "\e651";position: absolute;top: 50%;left: 10px;margin: -8px 0;}
+.searchForPanel:after {content: "\e600";position: absolute;top: 50%;right: 9px;width: 16px;height: 16px;line-height: 17px;margin: -8px 0;padding-left: 0;border-radius: 50%;font-size: 15px;color: #ffffff;background: #b4bdc8;}
+.searchForPanel input[type=text] {width: calc(100% - 70px);margin-top: 8px;margin-left: 35px;padding-left: 4px;padding-right: 4px;border: none;border-bottom: 1px solid #d6d6d6;outline: none;font-size: 14px;}
+.searchForPanel input[type=text]:placeholder-shown, .searchForPanel input[type=text]::-webkit-input-placeholder, .searchForPanel input[type=text]:-ms-input-placeholder, .searchForPanel input[type=text]::-ms-input-placeholder, .searchForPanel input[type=text]::placeholder {font-size: 12px;text-align: center;color: #a9a9a9;}
+
+/*分屏面板*/
+.splitScreenPanel {height: 100%;}
+.splitScreenPanel.splitScreenPanel_marger {padding: 5px;}
+.splitScreenItem {border: 1px solid #c2c1c7;}
+.splitScreenPanel.splitScreenPanel_marger .splitScreenItem {margin: 5px;}
+.splitScreenPanel.onePanel .splitScreenItem {width: 100%;height: 100%;}
+.splitScreenPanel.fourPanel .splitScreenItem {float: left;width: 50%;height: 50%;}
+.splitScreenPanel.ninePanel .splitScreenItem {float: left;width: 33.33%;height: 33.33%;}
+.splitScreenPanel.sixteenPanel .splitScreenItem {float: left;width: 25%;height: 25%;}
+.splitScreenPanel.splitScreenPanel_marger.onePanel .splitScreenItem {width: calc(100% - 10px);height: calc(100% - 10px);}
+.splitScreenPanel.splitScreenPanel_marger.fourPanel .splitScreenItem {width: calc(50% - 10px);height: calc(50% - 10px);}
+.splitScreenPanel.splitScreenPanel_marger.ninePanel .splitScreenItem {width: calc(33.33% - 10px);height: calc(33.33% - 10px);}
+.splitScreenPanel.splitScreenPanel_marger.sixteenPanel .splitScreenItem {width: calc(25% - 10px);height: calc(25% - 10px);}
+
+/**/
+.panel-body + .panel-heading {border-top: 1px solid #dddddd;}
+.marginB .form-group {margin-bottom: 15px!important;}
+.panel-body.marginB {padding-bottom: 0;}
+
+/*面板编号*/
+[data-number] {position: relative;}
+[data-number]:before {content: attr(data-number);position: absolute;top: 0;left: 5px;margin-top: -28px;font-style: italic;font-size: 40px;font-weight: bold;color: #ddd;z-index: 1;}
+[data-number]:after {content: '';position: absolute;top: 19px;left: 7px;width: 20px;height: 1px;border-radius: 50%;box-shadow: 0 0 2px 2px #585858;background: #565656;z-index: 0;}
+
+/*面板关闭按钮*/
+.panel-btnClear {display: inline-block;position: absolute;top: 0;right: 0;width: 16px;height: 16px;line-height: 16px;margin: -8px;border-radius: 50%;font-size: 16px;text-align: center;text-decoration: none;color: #ffffff;background: #e81123;z-index: 10;}
+.panel-btnClear:hover{text-decoration: none;color: #fff;}
+
+/*禁用多行文本框拖拽*/
+textarea.form-control {resize: none;}
+
+/*禁用面板*/
+.panel-disabled {position: relative;}
+.panel-disabled:before {content: '';position: absolute;top: 0;left: 0;right: 0;bottom: 0;background: rgba(255, 255, 255, .6);z-index: 100;}
+
+/*地图工具条*/
+.mapToolBar {position: absolute;top: 30px;left: 50px;border: 1px solid #cccccc;border-radius: 4px;-webkit-box-shadow: 1px 1px 4px #ccc;box-shadow: 1px 1px 4px #ccc;background: #fff;}
+.mapToolBar dt, .mapToolBar dd {float: left;}
+.mapToolBar dt {padding: 5px 8px;}
+.mapToolBar dd {height: 33px;}
+.mapToolBar a {position: relative;color: #333;font-size: 14px;text-indent: 1.2em;}
+.mapToolBar a:before {color: #333;position: absolute;top: 50%;left: 0;margin-top: -14px;padding: 0 5px 0 5px;font-size: 18px;text-indent: 0;}
+.divideLine {position: relative;padding: 0;}
+.divideLine:after {content: '';position: absolute;top: 4px;left: 0;display: inline-block;width: 0;height: calc(100% - 8px);border-left: 1px solid #ccc;}
+
+/*时间控件-bootstrap-datetimepicker*/
+.datetimepicker-top-right:before {left: 6px;bottom: -7px;}
+[class*=" datetimepicker-top"]:before {content: '';display: inline-block;border-left: 7px solid transparent;border-right: 7px solid transparent;border-top: 7px solid #ccc;border-top-color: rgba(0,0,0,0.2);position: absolute;}
+.datetimepicker-top-right:after {left: 7px;bottom: -6px;}
+[class*=" datetimepicker-top"]:after {content: '';display: inline-block;border-left: 6px solid transparent;border-right: 6px solid transparent;border-top: 6px solid #fff;position: absolute;}
+.datetimepicker-menu {position: absolute;bottom: 100%;left: 0;z-index: 1000;display: none;float: left;min-width: 160px;padding: 5px 0;margin: 2px 0 0;font-size: 14px;text-align: left;list-style: none;background-color: #fff;-webkit-background-clip: padding-box;background-clip: padding-box;border: 1px solid #ccc;border: 1px solid rgba(0, 0, 0, .15);border-radius: 4px;-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);box-shadow: 0 6px 12px rgba(0, 0, 0, .175);}
+.dropdown-menu .datetimepicker-days .table-condensed {margin: 0 auto;}
+.modal-dateTimePicker {position: fixed;top: 0;left: 0;right: 0;bottom: 0;background: #000000;opacity: 0;z-index: 1000}
+
+/*select2 style statr*/
+.select2-container .select2-selection--single {height: 34px;}
+.select2-container--default .select2-selection--single .select2-selection__rendered {line-height: 34px;}
+.select2-container--default .select2-selection--single .select2-selection__arrow {height: 32px;}
+.select2-container--default .select2-selection--single {border: 1px solid #cccccc;-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {border-color: #ccc transparent transparent transparent;}
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {border-color: transparent transparent #ccc transparent;}
+.select2-dropdown {border: 1px solid #ccc;}
+.select2-container--default .select2-search--dropdown .select2-search__field {border: 1px solid #ccc;}
+/*select2 style end*/
+
+/*jsGrid style statr*/
+.jsgrid-header-cell {padding: .35em .5em;}
+.jsgrid-cell {padding: .3em .5em;}
+/*jsGrid style end*/
